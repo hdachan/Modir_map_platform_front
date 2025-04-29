@@ -11,64 +11,59 @@ import '../models/feed.dart';
 PreferredSizeWidget customAppBar() {
   return PreferredSize(
     preferredSize: const Size.fromHeight(56),
-    child: AppBar(
-      automaticallyImplyLeading: false,
-      titleSpacing: 0,
-      backgroundColor: Colors.white,
-      title: Row(
-        children: [
-          // SVG 이미지 아이콘
-          GestureDetector(
-            onTap: () => print("로고 클릭"), // 뒤로가기 대신 로고 클릭 동작
-            child: Container(
-              padding: const EdgeInsets.all(16), // 기존 패딩 유지
-              child: SvgPicture.asset(
-                'assets/image/logo_primary.svg',
-                width: 24, // 아이콘 크기와 일치
-                height: 24,
-                fit: BoxFit.contain, // 원본 비율 유지
-              ),
+    child: Row(
+      children: [
+        // SVG 이미지 아이콘
+        GestureDetector(
+          onTap: () => print("로고 클릭"), // 뒤로가기 대신 로고 클릭 동작
+          child: Container(
+            padding: const EdgeInsets.all(16), // 기존 패딩 유지
+            child: SvgPicture.asset(
+              'assets/image/logo_primary.svg',
+              width: 24, // 아이콘 크기와 일치
+              height: 24,
+              fit: BoxFit.contain, // 원본 비율 유지
             ),
           ),
-          const Spacer(),
-          // 돋보기 아이콘
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () => print("돋보기 버튼 클릭"),
-              child: const Icon(
-                Icons.search_rounded,
-                size: 24,
-                color: Colors.black,
-              ),
+        ),
+        const Spacer(),
+        // 돋보기 아이콘
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
+            onTap: () => print("돋보기 버튼 클릭"),
+            child: const Icon(
+              Icons.search_rounded,
+              size: 24,
+              color: Colors.black,
             ),
           ),
-          // 종 아이콘
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () => print("종 버튼 클릭"),
-              child: const Icon(
-                Icons.notifications_outlined,
-                size: 24,
-                color: Colors.black,
-              ),
+        ),
+        // 종 아이콘
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
+            onTap: () => print("종 버튼 클릭"),
+            child: const Icon(
+              Icons.notifications_outlined,
+              size: 24,
+              color: Colors.black,
             ),
           ),
-          // 저장 아이콘
-          Padding(
-            padding: const EdgeInsets.only(right: 16),
-            child: GestureDetector(
-              onTap: () => print("저장 버튼 클릭"),
-              child: const Icon(
-                Icons.bookmark_border,
-                size: 24,
-                color: Colors.black,
-              ),
+        ),
+        // 저장 아이콘
+        Padding(
+          padding: const EdgeInsets.only(right: 16),
+          child: GestureDetector(
+            onTap: () => print("저장 버튼 클릭"),
+            child: const Icon(
+              Icons.bookmark_border,
+              size: 24,
+              color: Colors.black,
             ),
           ),
-        ],
-      ),
+        ),
+      ],
     ),
   );
 }

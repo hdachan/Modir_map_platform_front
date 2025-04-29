@@ -34,13 +34,6 @@ class _FeedScreenState extends State<FeedScreen> {
         child: Scaffold(
           appBar: AppBar(
             title: customAppBar(),
-            actions: [
-              IconButton(
-                icon: const Icon(Icons.logout),
-                onPressed: _logout,
-                tooltip: '로그아웃',
-              ),
-            ],
           ),
           body: Column(
             children: [

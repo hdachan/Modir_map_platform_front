@@ -2,9 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:modir/utils/SessionManager.dart';
 import 'package:modir/utils/session.dart';
-import '../mvvm/Mypage/views/Mypage.dart';
+
 import '../map_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
+import '../mvvm/Mypage/views/Mypage.dart';
+
+import '../mvvm/Mypage/views/SettingScreen.dart';
 import '../mvvm/feed/views/FeedDetailScreen.dart';
 import 'bottom_nav_screen.dart';
 import '../mvvm/feed/views/FeedScreen.dart';
@@ -33,7 +36,7 @@ final GoRouter router = GoRouter(
           builder: (context, state) => const FeedScreen(),
           routes: [
             GoRoute(
-              path: 'detail/:feedId', // feedId를 경로 파라미터로 정의
+              path: 'detail/:feedId',
               builder: (context, state) {
                 final feedId = int.parse(state.pathParameters['feedId']!);
                 return FeedDetailScreen(feedId: feedId);
@@ -44,6 +47,12 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/mypage',
           builder: (context, state) => const MyPageScreen(),
+          routes: [
+            GoRoute(
+              path: 'setting',
+              builder: (context, state) => SettingScreen(),
+            ),
+          ],
         ),
       ],
     ),
@@ -55,7 +64,7 @@ final GoRouter router = GoRouter(
 
     debugPrint('🚦 리디렉션: path=$path, isAuthenticated=$isAuthenticated');
 
-    if (!isAuthenticated && (path == '/map' || path == '/community' || path == '/mypage')) {
+    if (!isAuthenticated && (path == '/map' || path == '/community' || path == '/mypage' || path.startsWith('/mypage/'))) {
       return '/login';
     }
     if (isAuthenticated && path == '/login') {

@@ -2,52 +2,56 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-// 마이페이지 상단바
-PreferredSizeWidget custommypageAppBar() {
-  return PreferredSize(
-    preferredSize: const Size.fromHeight(56),
-    child: Row(
-      children: [
-        // SVG 이미지 아이콘
-        GestureDetector(
-          onTap: () => print("로고 클릭"), // 뒤로가기 대신 로고 클릭 동작
-          child: Container(
-            padding: const EdgeInsets.all(16), // 기존 패딩 유지
-            child: SvgPicture.asset(
-              'assets/image/logo_primary.svg',
-              width: 24, // 아이콘 크기와 일치
-              height: 24,
-              fit: BoxFit.contain, // 원본 비율 유지
-            ),
-          ),
+
+
+// 돟의하기 화면 상단바
+Widget CustomAppBar({required String title, required BuildContext context}) {
+  return LayoutBuilder(
+    builder: (context, constraints) {
+      return Container(
+        width: double.infinity,
+        height: 56,
+        color: const Color(0xFF1A1A1A),
+        padding: EdgeInsets.only(
+          right: 16,
         ),
-        const Spacer(),
-        // 종 아이콘
-        Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: GestureDetector(
-            onTap: () => print("종 버튼 클릭"),
-            child: const Icon(
-              Icons.notifications_outlined,
-              size: 24,
-              color: Colors.black,
+        child: Row(
+          children: [
+            // 뒤로가기 버튼
+            GestureDetector(
+              onTap: () {
+                Navigator.pop(context);
+              },
+              child: Container(
+                width: 56,
+                height: 56,
+                padding: const EdgeInsets.all(16),
+                child: Icon(
+                  Icons.chevron_left,
+                  size: 24,
+                  color: Colors.white,
+                ),
+              ),
             ),
-          ),
-        ),
-        // 설정아이콘
-        Padding(
-          padding: const EdgeInsets.only(right: 16),
-          child: GestureDetector(
-            onTap: () => print("저장 버튼 클릭"),
-            child: const Icon(
-              Icons.settings_outlined,
-              size: 24,
-              color: Colors.black,
+            Container(
+              height: 56,
+              padding: const EdgeInsets.only(top: 14,bottom: 14),
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 20,
+                  fontFamily: 'Pretendard',
+                  fontWeight: FontWeight.w700,
+                  height: 1.40,
+                  letterSpacing: -0.50,
+                ),
+              ),
             ),
-          ),
+          ],
         ),
-      ],
-    ),
+      );
+    },
   );
 }
 
