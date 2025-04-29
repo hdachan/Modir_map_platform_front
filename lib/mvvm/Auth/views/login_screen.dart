@@ -33,25 +33,12 @@ class LoginPage extends StatelessWidget {
               onPressed: () async {
                 await viewModel.signIn();
                 if (viewModel.jwt != null) {
-                  context.go('/map');
+                  context.go('/community');
                 }
               },
               child: const Text('로그인'),
             ),
             const SizedBox(height: 12),
-            ElevatedButton(
-              onPressed: viewModel.signUpTestUser,
-              child: const Text('테스트 사용자 등록'),
-            ),
-            ElevatedButton(
-              onPressed: viewModel.jwt == null ? null : () => viewModel.sendJwtToSpring(isPrivate: false),
-              child: const Text('🌐 Public API 호출'),
-            ),
-            ElevatedButton(
-              onPressed: viewModel.jwt == null ? null : () => viewModel.sendJwtToSpring(isPrivate: true),
-              child: const Text('🔐 Private API 호출'),
-            ),
-            const SizedBox(height: 20),
             if (viewModel.errorMessage != null)
               Text(
                 viewModel.errorMessage!,

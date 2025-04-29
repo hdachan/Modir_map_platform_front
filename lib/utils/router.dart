@@ -49,7 +49,7 @@ final GoRouter router = GoRouter(
       return '/login';
     }
     if (isAuthenticated && path == '/login') {
-      return '/map';
+      return '/community';
     }
     return null;
   },

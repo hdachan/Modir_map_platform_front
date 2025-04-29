@@ -21,7 +21,7 @@ class _AuthCheckScreenState extends State<AuthCheckScreen> {
     final isAuthenticated = await sessionManager.isAuthenticated();
     debugPrint('🔍 AuthCheckScreen: isAuthenticated=$isAuthenticated');
     if (mounted) {
-      context.go(isAuthenticated ? '/map' : '/login');
+      context.go(isAuthenticated ? '/community' : '/login');
     }
   }
 
