@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 
 import '../models/feed.dart';
-import '../views/FeedDetailScreen.dart';
 
 
 
@@ -127,12 +127,7 @@ class PostCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (_) => FeedDetailScreen(feedId: feed.feedId),
-          ),
-        );
+        context.go('/community/detail/${feed.feedId}');
       },
       child: Container(
         height: 146,
@@ -333,21 +328,3 @@ class PostCard extends StatelessWidget {
   }
 }
 
-
-/// 잠시 복사
-/// Container(
-//                           height: 40,
-//                           child: Text(
-//                             '나만의 분위기 , 라이프스타일 , 스타일링에 따라 \n매장을 추천받아보세요',
-//                             style: TextStyle(
-//                               color: Colors.white,
-//                               fontSize: 14,
-//                               fontFamily: 'Pretendard',
-//                               fontWeight: FontWeight.w500,
-//                               height: 1.40,
-//                               letterSpacing: -0.35,
-//                             ),
-//                             overflow: TextOverflow.ellipsis,
-//                             maxLines: 2,
-//                           ),
-//                         ),

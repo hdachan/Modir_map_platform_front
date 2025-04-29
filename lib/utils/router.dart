@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:modir/utils/SessionManager.dart';
 import 'package:modir/utils/session.dart';
-import '../mvvm/Mypage/Mypage.dart';
+import '../mvvm/Mypage/views/Mypage.dart';
 import '../map_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
+import '../mvvm/feed/views/FeedDetailScreen.dart';
 import 'bottom_nav_screen.dart';
 import '../mvvm/feed/views/FeedScreen.dart';
 
@@ -30,6 +31,15 @@ final GoRouter router = GoRouter(
         GoRoute(
           path: '/community',
           builder: (context, state) => const FeedScreen(),
+          routes: [
+            GoRoute(
+              path: 'detail/:feedId', // feedId를 경로 파라미터로 정의
+              builder: (context, state) {
+                final feedId = int.parse(state.pathParameters['feedId']!);
+                return FeedDetailScreen(feedId: feedId);
+              },
+            ),
+          ],
         ),
         GoRoute(
           path: '/mypage',

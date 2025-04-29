@@ -17,9 +17,15 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   void didChangeDependencies() {
     super.didChangeDependencies();
     final location = GoRouterState.of(context).uri.toString();
+
     setState(() {
-      _selectedIndex = location.startsWith('/community') ? 1
-          : location.startsWith('/mypage') ? 2 : 0;
+      if (location.startsWith('/community')) {
+        _selectedIndex = 1;
+      } else if (location.startsWith('/mypage')) {
+        _selectedIndex = 2;
+      } else {
+        _selectedIndex = 0;
+      }
     });
   }
 
@@ -33,18 +39,31 @@ class _BottomNavScreenState extends State<BottomNavScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: widget.child,
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.location_on_outlined), label: '지도'),
-          BottomNavigationBarItem(icon: Icon(Icons.sports_kabaddi_outlined), label: '커뮤니티'),
-          BottomNavigationBarItem(icon: Icon(Icons.person_outline), label: '마이'),
-        ],
+      body: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 600),
+          child: Column(
+            children: [
+              Expanded(child: widget.child),
+              BottomNavigationBar(
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                items: const [
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.location_on_outlined), label: '지도'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.sports_kabaddi_outlined), label: '커뮤니티'),
+                  BottomNavigationBarItem(
+                      icon: Icon(Icons.person_outline), label: '마이'),
+                ],
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
+
 }
 
 
