@@ -1,9 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 
 import '../models/FeedDetail.dart';
 import '../models/feed.dart';
 import '../services/FeedService.dart';
-
+import 'package:http/http.dart' as http;
 
 class FeedViewModel extends ChangeNotifier {
   final FeedRepository repository;
@@ -133,5 +135,16 @@ class FeedViewModel extends ChangeNotifier {
       notifyListeners();
     }
   }
+
+  final _feedRepository = FeedRepository();
+
+  Future<void> deleteFeed(int feedId) async {
+    try {
+      await _feedRepository.deleteFeed(feedId); // ✅ 올바른 호출
+    } catch (e) {
+      throw Exception("뷰모델 삭제 실패: $e");
+    }
+  }
+
 
 }

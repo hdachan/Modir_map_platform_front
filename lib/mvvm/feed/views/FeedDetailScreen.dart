@@ -82,6 +82,40 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
     );
   }
 
+  // 삭제 다이얼로그 표시
+  void _showDeleteDialog(BuildContext context, FeedViewModel viewModel) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text("삭제 확인"),
+        content: const Text("정말로 이 게시물을 삭제하시겠습니까?"),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: const Text("취소"),
+          ),
+          TextButton(
+            onPressed: () async {
+              Navigator.pop(context); // 먼저 다이얼로그 닫기
+              try {
+                await viewModel.deleteFeed(widget.feedId);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(content: Text("삭제 완료")),
+                );
+                Navigator.pop(context); // 상세 화면 닫기
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("삭제 실패: $e")),
+                );
+              }
+            },
+            child: const Text("삭제", style: TextStyle(color: Colors.red)),
+          ),
+        ],
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +127,13 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             onPressed: () {
               final viewModel = Provider.of<FeedViewModel>(context, listen: false);
               _showEditDialog(context, viewModel);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.delete),
+            onPressed: () {
+              final viewModel = Provider.of<FeedViewModel>(context, listen: false);
+              _showDeleteDialog(context, viewModel);
             },
           ),
         ],

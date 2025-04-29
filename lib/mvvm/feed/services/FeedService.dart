@@ -144,16 +144,20 @@ class FeedRepository {
 
   /// 게시글 삭제 (숨김 처리)
   Future<void> deleteFeed(int feedId) async {
-    final headers = await _getAuthHeaders();
-    final response = await http.put(
+    final headers = await _getAuthHeaders(); // Authorization 헤더 포함
+    final response = await http.patch(
       Uri.parse("$baseUrl/delete"),
       headers: headers,
-      body: jsonEncode(feedId),
+      body: jsonEncode({
+        "feedId": feedId, // ✅ JSON 객체 형태로 보내야 함
+      }),
     );
+
     if (response.statusCode != 200) {
       throw Exception("삭제 실패: ${response.statusCode}");
     }
   }
+
 
   /// 좋아요 토글
   Future<int> toggleLike(int feedId) async {
