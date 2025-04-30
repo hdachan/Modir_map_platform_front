@@ -24,8 +24,8 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
     final feed = viewModel.selectedFeed;
     if (feed == null) return;
 
-    final titleController = TextEditingController(text: feed.title ?? '');
-    final contentController = TextEditingController(text: feed.content ?? '');
+    final titleController = TextEditingController(text: feed.title);
+    final contentController = TextEditingController(text: feed.content);
 
     showDialog(
       context: context,
@@ -122,18 +122,25 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
       appBar: AppBar(
         title: const Text("게시글 상세"),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              final viewModel = Provider.of<FeedViewModel>(context, listen: false);
-              _showEditDialog(context, viewModel);
-            },
-          ),
-          IconButton(
-            icon: const Icon(Icons.delete),
-            onPressed: () {
-              final viewModel = Provider.of<FeedViewModel>(context, listen: false);
-              _showDeleteDialog(context, viewModel);
+          Consumer<FeedViewModel>(
+            builder: (context, viewModel, _) {
+              final feed = viewModel.selectedFeed;
+              final isAuthor = feed?.isAuthor ?? false; // isAuthor가 true일 때만 버튼 표시
+
+              return isAuthor
+                  ? Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.edit),
+                    onPressed: () => _showEditDialog(context, viewModel),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.delete),
+                    onPressed: () => _showDeleteDialog(context, viewModel),
+                  ),
+                ],
+              )
+                  : const SizedBox.shrink(); // 작성자가 아니면 버튼 숨김
             },
           ),
         ],
@@ -146,7 +153,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             return const Center(child: CircularProgressIndicator());
           }
 
-          if (feed == null || (feed.title == null && feed.content == null)) {
+          if (feed == null || (feed.title.isEmpty && feed.content.isEmpty)) {
             return const Center(child: Text("게시글을 찾을 수 없습니다."));
           }
 
@@ -156,11 +163,11 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  feed.title ?? "제목 없음",
+                  feed.title,
                   style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 8),
-                Text(feed.content ?? "내용 없음"),
+                Text(feed.content),
                 const SizedBox(height: 16),
                 Row(
                   children: [
@@ -179,9 +186,9 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                   ],
                 ),
                 const SizedBox(height: 16),
-                Text("작성자: ${feed.username ?? '알 수 없음'}"),
+                Text("작성자: ${feed.username}"),
                 Text("조회수: ${feed.hits}"),
-                Text("작성일: ${feed.createdAt ?? '알 수 없음'}"),
+                Text("작성일: ${feed.createdAt}"),
               ],
             ),
           );

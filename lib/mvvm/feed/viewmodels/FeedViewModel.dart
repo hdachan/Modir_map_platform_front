@@ -50,6 +50,54 @@ class FeedViewModel extends ChangeNotifier {
     }
   }
 
+  Future<void> updateFeed(int feedId, String title, String content) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+      final headers = await repository.getAuthHeaders(); // repository를 통해 호출
+      final userId = headers['userId']!;
+      await repository.updateFeed(feedId, title, content, userId);
+      if (selectedFeed != null) {
+        selectedFeed = FeedDetail(
+          username: selectedFeed!.username,
+          title: title,
+          content: content,
+          hits: selectedFeed!.hits,
+          createdAt: selectedFeed!.createdAt,
+          sumLike: selectedFeed!.sumLike,
+          liked: selectedFeed!.liked,
+          isAuthor: selectedFeed!.isAuthor,
+        );
+      }
+      _feeds = _feeds.map((feed) {
+        if (feed.feedId == feedId) {
+          return Feed(
+            feedId: feed.feedId,
+            title: title,
+            content: content,
+            createdAt: feed.createdAt,
+            likeCount: feed.likeCount,
+            liked: feed.liked,
+            username: feed.username,
+            hits: feed.hits,
+          );
+        }
+        return feed;
+      }).toList();
+      print("🟢 게시물 수정 성공: feedId=$feedId, title=$title");
+      notifyListeners();
+    } catch (e) {
+      print("🔴 게시물 수정 실패: $e");
+      throw Exception(
+        e.toString().contains("작성자만") ? "본인의 게시글만 수정할 수 있습니다" : "게시물 수정에 실패했습니다",
+      );
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
   Future<void> toggleLike(int feedId) async {
     try {
       // 서버에서 좋아요 토글 결과 받아옴
@@ -66,6 +114,7 @@ class FeedViewModel extends ChangeNotifier {
           createdAt: selectedFeed!.createdAt,
           sumLike: liked ? selectedFeed!.sumLike + 1 : selectedFeed!.sumLike - 1,
           liked: liked,
+          isAuthor: selectedFeed!.isAuthor, // isAuthor 값 유지
         );
       }
 
@@ -79,8 +128,8 @@ class FeedViewModel extends ChangeNotifier {
             createdAt: feed.createdAt,
             likeCount: liked ? feed.likeCount + 1 : feed.likeCount - 1,
             liked: liked,
-            username: feed.username, // 추가된 필드
-            hits: feed.hits, // 추가된 필드
+            username: feed.username,
+            hits: feed.hits,
           );
         }
         return feed;
@@ -92,49 +141,6 @@ class FeedViewModel extends ChangeNotifier {
     }
   }
 
-  Future<void> updateFeed(int feedId, String title, String content) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-      await repository.updateFeed(feedId, title, content, "456"); // 테스트용 uuid
-      if (selectedFeed != null) {
-        selectedFeed = FeedDetail(
-          username: selectedFeed!.username,
-          title: title,
-          content: content,
-          hits: selectedFeed!.hits,
-          createdAt: selectedFeed!.createdAt,
-          sumLike: selectedFeed!.sumLike,
-          liked: selectedFeed!.liked,
-        );
-      }
-      _feeds = _feeds.map((feed) {
-        if (feed.feedId == feedId) {
-          return Feed(
-            feedId: feed.feedId,
-            title: title,
-            content: content,
-            createdAt: feed.createdAt,
-            likeCount: feed.likeCount,
-            liked: feed.liked,
-            username: feed.username, // 추가된 필드
-            hits: feed.hits, // 추가된 필드
-          );
-        }
-        return feed;
-      }).toList();
-      print("🟢 게시물 수정 성공: feedId=$feedId, title=$title");
-      notifyListeners();
-    } catch (e) {
-      print("🔴 게시물 수정 실패: $e");
-      throw Exception(
-        e.toString().contains("작성자만") ? e.toString() : "게시물 수정에 실패했습니다",
-      );
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
 
   final _feedRepository = FeedRepository();
 

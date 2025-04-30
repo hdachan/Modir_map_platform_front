@@ -8,7 +8,7 @@ class FeedRepository {
   final String baseUrl = "http://localhost:8080/api/feed";
 
   /// 세션 정보 가져오기
-  Future<Map<String, String>> _getAuthHeaders() async {
+  Future<Map<String, String>> getAuthHeaders() async {
     final session = await SessionManager().getSession();
     final jwt = session['jwt'];
     final userId = session['userId'];
@@ -24,7 +24,7 @@ class FeedRepository {
 
   /// 전체 게시글 조회
   Future<List<Feed>> fetchFeeds() async {
-    final headers = await _getAuthHeaders();
+    final headers = await getAuthHeaders();
     final userId = headers['userId']!;
     final response = await http.get(
       Uri.parse("$baseUrl?uuid=$userId"),
@@ -56,7 +56,7 @@ class FeedRepository {
 
   /// 게시글 상세 조회
   Future<FeedDetail> fetchFeedDetail(int feedId) async {
-    final headers = await _getAuthHeaders();
+    final headers = await getAuthHeaders();
     final userId = headers['userId']!;
     final response = await http.get(
       Uri.parse("$baseUrl/detail?feedId=$feedId&uuid=$userId"),
@@ -90,23 +90,9 @@ class FeedRepository {
     }
   }
 
-  /// 게시글 등록
-  Future<void> postFeed(String title, String content) async {
-    final headers = await _getAuthHeaders();
-    final userId = headers['userId']!;
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: headers,
-      body: jsonEncode({"title": title, "content": content, "uuid": userId}),
-    );
-    if (response.statusCode != 200) {
-      throw Exception("게시글 등록 실패: ${response.statusCode}");
-    }
-  }
-
   /// 게시글 수정
   Future<void> updateFeed(int feedId, String title, String content, String uuid) async {
-    final headers = await _getAuthHeaders();
+    final headers = await getAuthHeaders();
     final userId = headers['userId']!;
     final response = await http.patch(
       Uri.parse(baseUrl),
@@ -142,9 +128,25 @@ class FeedRepository {
     }
   }
 
+  /// 게시글 등록
+  Future<void> postFeed(String title, String content) async {
+    final headers = await getAuthHeaders();
+    final userId = headers['userId']!;
+    final response = await http.post(
+      Uri.parse(baseUrl),
+      headers: headers,
+      body: jsonEncode({"title": title, "content": content, "uuid": userId}),
+    );
+    if (response.statusCode != 200) {
+      throw Exception("게시글 등록 실패: ${response.statusCode}");
+    }
+  }
+
+
+
   /// 게시글 삭제 (숨김 처리)
   Future<void> deleteFeed(int feedId) async {
-    final headers = await _getAuthHeaders(); // Authorization 헤더 포함
+    final headers = await getAuthHeaders(); // Authorization 헤더 포함
     final response = await http.patch(
       Uri.parse("$baseUrl/delete"),
       headers: headers,
@@ -161,7 +163,7 @@ class FeedRepository {
 
   /// 좋아요 토글
   Future<int> toggleLike(int feedId) async {
-    final headers = await _getAuthHeaders();
+    final headers = await getAuthHeaders();
     final userId = headers['userId']!;
     final response = await http.get(
       Uri.parse("http://localhost:8080/api/like?feedId=$feedId&uuid=$userId"),

@@ -6,6 +6,7 @@ class FeedDetail {
   final String createdAt;
   final int sumLike;
   final bool liked;
+  final bool isAuthor; // int -> bool
 
   FeedDetail({
     required this.username,
@@ -15,6 +16,7 @@ class FeedDetail {
     required this.createdAt,
     required this.sumLike,
     required this.liked,
+    required this.isAuthor,
   });
 
   factory FeedDetail.fromJson(Map<String, dynamic> json) {
@@ -27,9 +29,10 @@ class FeedDetail {
       createdAt: json['createdAt']?.toString() ?? '',
       sumLike: _parseInt(json['sumLike'], 0),
       liked: _parseInt(json['status'], 0) == 1,
+      isAuthor: json['isAuthor'] == true || _parseInt(json['isAuthor'], 0) == 1, // bool 또는 int 처리
     );
   }
-  // 안전한 int 파싱 헬퍼 함수
+
   static int _parseInt(dynamic value, int defaultValue) {
     if (value is int) return value;
     if (value is String) return int.tryParse(value) ?? defaultValue;
