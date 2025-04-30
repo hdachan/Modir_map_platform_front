@@ -3,6 +3,9 @@ import 'package:http/http.dart' as http;
 import '../models/FeedDetail.dart';
 import '../models/feed.dart';
 import '../../../utils/SessionManager.dart';
+import 'package:http_parser/http_parser.dart';
+
+
 
 class FeedRepository {
   final String baseUrl = "http://localhost:8080/api/feed";
@@ -129,18 +132,35 @@ class FeedRepository {
   }
 
   /// 게시글 등록
-  Future<void> postFeed(String title, String content) async {
+  Future<void> postFeed(String title, String content, {List<String>? pics}) async {
     final headers = await getAuthHeaders();
     final userId = headers['userId']!;
-    final response = await http.post(
-      Uri.parse(baseUrl),
-      headers: headers,
-      body: jsonEncode({"title": title, "content": content, "uuid": userId}),
-    );
+
+    var request = http.MultipartRequest('POST', Uri.parse(baseUrl));
+
+    request.headers['Authorization'] = headers['Authorization']!;
+    request.headers['userId'] = userId;
+
+    // JSON 데이터를 MultipartFile로 만들어서 전송
+    final reqJson = jsonEncode({'title': title, 'content': content});
+    request.files.add(http.MultipartFile.fromString('req', reqJson, contentType: MediaType('application', 'json')));
+
+    // 실제 파일이 있다면 추가
+    if (pics != null && pics.isNotEmpty) {
+      for (var path in pics) {
+        request.files.add(await http.MultipartFile.fromPath('pics', path));
+      }
+    }
+
+    final response = await request.send();
+    final responseBody = await http.Response.fromStream(response);
+
     if (response.statusCode != 200) {
+      print("게시글 등록 실패: ${response.statusCode}, 본문: ${responseBody.body}");
       throw Exception("게시글 등록 실패: ${response.statusCode}");
     }
   }
+
 
 
 

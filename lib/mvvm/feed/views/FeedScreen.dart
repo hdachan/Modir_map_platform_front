@@ -57,6 +57,14 @@ class _FeedScreenState extends State<FeedScreen> {
             ],
           ),
           backgroundColor: Colors.white,
+          floatingActionButton: FloatingActionButton(
+            onPressed: () {
+              context.go('/community/write'); // 올바른 경로로 수정
+            },
+            backgroundColor: Colors.blue,
+            child: const Icon(Icons.edit, color: Colors.white),
+            tooltip: '글쓰기',
+          ),
         ),
       ),
     );

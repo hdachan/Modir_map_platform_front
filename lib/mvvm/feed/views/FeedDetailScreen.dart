@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../viewmodels/FeedViewModel.dart';
 
@@ -96,19 +97,20 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
           ),
           TextButton(
             onPressed: () async {
-              Navigator.pop(context); // 먼저 다이얼로그 닫기
+              Navigator.pop(context); // 삭제 확인 다이얼로그 닫기
               try {
                 await viewModel.deleteFeed(widget.feedId);
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("삭제 완료")),
                 );
-                Navigator.pop(context); // 상세 화면 닫기
+                context.go('/community'); // ← 상세 화면 닫고 커뮤니티 목록으로 이동
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("삭제 실패: $e")),
                 );
               }
             },
+
             child: const Text("삭제", style: TextStyle(color: Colors.red)),
           ),
         ],

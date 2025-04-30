@@ -142,6 +142,7 @@ class FeedViewModel extends ChangeNotifier {
   }
 
 
+  ///삭제
   final _feedRepository = FeedRepository();
 
   Future<void> deleteFeed(int feedId) async {
@@ -149,6 +150,25 @@ class FeedViewModel extends ChangeNotifier {
       await _feedRepository.deleteFeed(feedId); // ✅ 올바른 호출
     } catch (e) {
       throw Exception("뷰모델 삭제 실패: $e");
+    }
+  }
+
+  /// 등록
+  Future<void> postFeed(String title, String content, {List<String>? pics}) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      print("🟡 게시글 등록 시도: title=$title, pics=$pics");
+      await repository.postFeed(title, content, pics: pics);
+      await fetchFeeds();
+      print("🟢 게시글 등록 성공: title=$title");
+    } catch (e) {
+      print("🔴 게시글 등록 실패: $e");
+      throw Exception("게시글 등록에 실패했습니다: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
     }
   }
 
