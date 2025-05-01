@@ -6,8 +6,8 @@ import 'package:modir/utils/session.dart';
 import '../map_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
 import '../mvvm/Mypage/views/Mypage.dart';
-
 import '../mvvm/Mypage/views/SettingScreen.dart';
+import '../mvvm/Mypage/views/WithdrawalScreen.dart';
 import '../mvvm/feed/WriteScreen.dart';
 import '../mvvm/feed/views/FeedDetailScreen.dart';
 import 'bottom_nav_screen.dart';
@@ -15,7 +15,7 @@ import '../mvvm/feed/views/FeedScreen.dart';
 
 final GoRouter router = GoRouter(
   initialLocation: '/auth_check',
-  debugLogDiagnostics: true, // 디버그 로그 활성화
+  debugLogDiagnostics: true,
   routes: [
     GoRoute(
       path: '/auth_check',
@@ -51,16 +51,22 @@ final GoRouter router = GoRouter(
         ),
         GoRoute(
           path: '/mypage',
-          builder: (context, state) => const MyPageScreen(),
+          builder: (context, state) => MyPageScreen(),
           routes: [
             GoRoute(
               path: 'setting',
               builder: (context, state) => SettingScreen(),
+              routes: [
+                GoRoute(
+                  path: 'withdrawal_reason',
+                  pageBuilder: (context, state) => MaterialPage(child: WithdrawalScreen()),
+                ),
+              ],
             ),
           ],
         ),
       ],
-    )
+    ),
   ],
   redirect: (BuildContext context, GoRouterState state) async {
     final sessionManager = SessionManager();
@@ -69,12 +75,26 @@ final GoRouter router = GoRouter(
 
     debugPrint('🚦 리디렉션: path=$path, isAuthenticated=$isAuthenticated');
 
-    if (!isAuthenticated && (path == '/map' || path == '/community' || path == '/mypage' || path.startsWith('/mypage/'))) {
+    // 보호된 경로 목록
+    final protectedPrefixes = [
+      '/map',
+      '/community',
+      '/mypage',
+    ];
+
+    final isProtected = protectedPrefixes.any((prefix) =>
+    path == prefix || path.startsWith('$prefix/'));
+
+    // 비로그인 시 보호된 경로 접근 → 로그인 페이지로
+    if (!isAuthenticated && isProtected) {
       return '/login';
     }
+
+    // 로그인된 사용자가 로그인 페이지 접근 → 커뮤니티로 리디렉션
     if (isAuthenticated && path == '/login') {
       return '/community';
     }
+
     return null;
   },
 );
