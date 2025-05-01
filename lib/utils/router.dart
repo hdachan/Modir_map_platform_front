@@ -8,7 +8,7 @@ import '../mvvm/Auth/views/auth_selection_screen.dart';
 import '../mvvm/Mypage/views/Mypage.dart';
 
 import '../mvvm/Mypage/views/SettingScreen.dart';
-import '../mvvm/feed/WriteFeedScreen.dart';
+import '../mvvm/feed/WriteScreen.dart';
 import '../mvvm/feed/views/FeedDetailScreen.dart';
 import 'bottom_nav_screen.dart';
 import '../mvvm/feed/views/FeedScreen.dart';
