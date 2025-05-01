@@ -16,6 +16,7 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFF1A1A1A),
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(

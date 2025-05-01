@@ -32,11 +32,9 @@ class _FeedScreenState extends State<FeedScreen> {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 600),
         child: Scaffold(
-          appBar: AppBar(
-            title: customAppBar(),
-          ),
           body: Column(
             children: [
+              customAppBar(),
               customBodyBar(context, "공지"),
               Expanded(
                 child: Consumer<FeedViewModel>(

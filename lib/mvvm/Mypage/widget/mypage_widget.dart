@@ -11,7 +11,7 @@ Widget CustomAppBar({required String title, required BuildContext context}) {
       return Container(
         width: double.infinity,
         height: 56,
-        color: const Color(0xFF1A1A1A),
+        color:  Colors.white,
         padding: EdgeInsets.only(
           right: 16,
         ),
@@ -29,7 +29,7 @@ Widget CustomAppBar({required String title, required BuildContext context}) {
                 child: Icon(
                   Icons.chevron_left,
                   size: 24,
-                  color: Colors.white,
+                  color: Colors.black,
                 ),
               ),
             ),
@@ -39,7 +39,7 @@ Widget CustomAppBar({required String title, required BuildContext context}) {
               child: Text(
                 title,
                 style: TextStyle(
-                  color: Colors.white,
+                  color: Colors.black,
                   fontSize: 20,
                   fontFamily: 'Pretendard',
                   fontWeight: FontWeight.w700,
@@ -69,7 +69,7 @@ Widget middleText(String text) {
           child: Text(
             text,
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 14,
               fontFamily: 'Pretendard',
               fontWeight: FontWeight.w700,

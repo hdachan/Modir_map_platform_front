@@ -25,56 +25,7 @@ class _stateMyPageScreen extends State<MyPageScreen>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
-      appBar: AppBar(
-        title: PreferredSize(
-          preferredSize: const Size.fromHeight(56),
-          child: Row(
-            children: [
-              // SVG 이미지 아이콘
-              GestureDetector(
-                onTap: () => print("로고 클릭"), // 뒤로가기 대신 로고 클릭 동작
-                child: Container(
-                  padding: const EdgeInsets.all(16), // 기존 패딩 유지
-                  child: SvgPicture.asset(
-                    'assets/image/logo_primary.svg',
-                    width: 24, // 아이콘 크기와 일치
-                    height: 24,
-                    fit: BoxFit.contain, // 원본 비율 유지
-                  ),
-                ),
-              ),
-              const Spacer(),
-              // 종 아이콘
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: GestureDetector(
-                  onTap: () => print("종 버튼 클릭"),
-                  child: const Icon(
-                    Icons.notifications_outlined,
-                    size: 24,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-              // 설정아이콘
-              Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: GestureDetector(
-                  onTap: () {
-                    context.go('/mypage/setting');
-                  },
-                  child: const Icon(
-                    Icons.settings_outlined,
-                    size: 24,
-                    color: Colors.black,
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+      backgroundColor:  Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -84,6 +35,53 @@ class _stateMyPageScreen extends State<MyPageScreen>
                 builder: (context, profileVM, child) {
                   return Column(
                     children: [
+                      PreferredSize(
+                        preferredSize: const Size.fromHeight(56),
+                        child: Row(
+                          children: [
+                            // SVG 이미지 아이콘
+                            GestureDetector(
+                              onTap: () => print("로고 클릭"), // 뒤로가기 대신 로고 클릭 동작
+                              child: Container(
+                                padding: const EdgeInsets.all(16), // 기존 패딩 유지
+                                child: SvgPicture.asset(
+                                  'assets/image/logo_primary.svg',
+                                  width: 24, // 아이콘 크기와 일치
+                                  height: 24,
+                                  fit: BoxFit.contain, // 원본 비율 유지
+                                ),
+                              ),
+                            ),
+                            const Spacer(),
+                            // 종 아이콘
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: GestureDetector(
+                                onTap: () => print("종 버튼 클릭"),
+                                child: const Icon(
+                                  Icons.notifications_outlined,
+                                  size: 24,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            // 설정아이콘
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: GestureDetector(
+                                onTap: () {
+                                  context.go('/mypage/setting');
+                                },
+                                child: const Icon(
+                                  Icons.settings_outlined,
+                                  size: 24,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () {
                           print('Profile card tapped');

@@ -3,6 +3,7 @@ import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:provider/provider.dart';
 import 'cofing/SupabaseConfig.dart';
 import 'mvvm/Mypage/viewmodels/ProfileViewModel.dart';
+import 'mvvm/Mypage/viewmodels/WithdrawalViewModel.dart';
 import 'utils/router.dart';
 import 'utils/SessionManager.dart';
 import 'mvvm/Auth/services/AuthService.dart';
@@ -30,6 +31,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => FeedViewModel(FeedRepository())),
         ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
         ChangeNotifierProvider(create: (_) => ProfileViewModel()),
+        ChangeNotifierProvider(create: (_) => WithdrawalViewModel()),
       ],
       child: MaterialApp.router(
         title: 'modirApp',

@@ -97,7 +97,7 @@ class _SettingScreenState extends State<SettingScreen> with SingleTickerProvider
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor:  Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           child: Center(
@@ -119,8 +119,10 @@ class _SettingScreenState extends State<SettingScreen> with SingleTickerProvider
                 customButton(
                   '탈퇴하기',
                       () {
+                    context.go('/mypage/setting/withdrawal_reason');
                   },
                 ),
+
               ],
             ),
           ),
