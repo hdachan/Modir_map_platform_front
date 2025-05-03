@@ -35,15 +35,19 @@ class FeedViewModel extends ChangeNotifier {
   }
 
   Future<void> loadFeedDetail(int feedId) async {
+    if (_isLoading) return; // 중복 요청 방지
     _isLoading = true;
     notifyListeners();
 
     try {
-      print("🟡 상세 불러오기 시작");
+      print("🟡 상세 불러오기 시작: feedId=$feedId");
       selectedFeed = await repository.fetchFeedDetail(feedId);
-      print("🟢 상세 불러오기 성공: ${selectedFeed?.title}");
+      print("🟢 상세 불러오기 성공: ${selectedFeed?.title ?? 'No title'}");
     } catch (e) {
       print("🔴 상세 불러오기 실패: $e");
+      selectedFeed = null; // 에러 시 selectedFeed 초기화
+      // 필요 시 에러 메시지 저장
+      // errorMessage = '피드 상세를 불러오지 못했습니다: $e';
     } finally {
       _isLoading = false;
       notifyListeners();

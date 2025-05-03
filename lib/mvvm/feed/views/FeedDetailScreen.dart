@@ -16,8 +16,10 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
   @override
   void initState() {
     super.initState();
-    final viewModel = Provider.of<FeedViewModel>(context, listen: false);
-    viewModel.loadFeedDetail(widget.feedId);
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final viewModel = Provider.of<FeedViewModel>(context, listen: false);
+      viewModel.loadFeedDetail(widget.feedId);
+    });
   }
 
   // 수정 다이얼로그 표시
@@ -53,7 +55,8 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
           ),
           TextButton(
             onPressed: () async {
-              if (titleController.text.isEmpty || contentController.text.isEmpty) {
+              if (titleController.text.isEmpty ||
+                  contentController.text.isEmpty) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("제목과 내용을 입력하세요")),
                 );
@@ -110,7 +113,6 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                 );
               }
             },
-
             child: const Text("삭제", style: TextStyle(color: Colors.red)),
           ),
         ],
@@ -121,32 +123,85 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("게시글 상세"),
-        actions: [
-          Consumer<FeedViewModel>(
-            builder: (context, viewModel, _) {
-              final feed = viewModel.selectedFeed;
-              final isAuthor = feed?.isAuthor ?? false; // isAuthor가 true일 때만 버튼 표시
+      backgroundColor:  Colors.white,
+      appBar: PreferredSize(
+        preferredSize: const Size.fromHeight(56),
+        child: AppBar(
+          automaticallyImplyLeading: false, // 기본 뒤로가기 제거
+          backgroundColor: Colors.white,
+          elevation: 0,
+          flexibleSpace: SafeArea(
+            child: Row(
+              children: [
+                // 로고
+                GestureDetector(
+                  onTap: () {
+                    Navigator.pop(context);
+                  },
+                  child: Container(
+                    width: 56,
+                    height: 56,
+                    padding: const EdgeInsets.all(16),
+                    child: Icon(
+                      Icons.chevron_left,
+                      size: 24,
+                      color: Colors.black,
+                    ),
+                  ),
+                ),
+                const Spacer(),
 
-              return isAuthor
-                  ? Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.edit),
-                    onPressed: () => _showEditDialog(context, viewModel),
+                // 설정 아이콘
+                Padding(
+                  padding: const EdgeInsets.only(right: 8),
+                  child: GestureDetector(
+                    onTap: () {
+                    },
+                    child: const Icon(
+                      Icons.ios_share,
+                      size: 24,
+                      color: Colors.black,
+                    ),
                   ),
-                  IconButton(
-                    icon: const Icon(Icons.delete),
-                    onPressed: () => _showDeleteDialog(context, viewModel),
-                  ),
-                ],
-              )
-                  : const SizedBox.shrink(); // 작성자가 아니면 버튼 숨김
-            },
+                ),
+
+                // 작성자일 경우에만 메뉴 아이콘 추가
+                Consumer<FeedViewModel>(
+                  builder: (context, viewModel, _) {
+                    final feed = viewModel.selectedFeed;
+                    final isAuthor = feed?.isAuthor ?? false;
+
+                    return isAuthor
+                        ? PopupMenuButton<String>(
+                      onSelected: (value) {
+                        if (value == 'edit') {
+                          _showEditDialog(context, viewModel);
+                        } else if (value == 'delete') {
+                          _showDeleteDialog(context, viewModel);
+                        }
+                      },
+                      itemBuilder: (BuildContext context) => [
+                        const PopupMenuItem(
+                          value: 'edit',
+                          child: Text('수정하기'),
+                        ),
+                        const PopupMenuItem(
+                          value: 'delete',
+                          child: Text('삭제하기'),
+                        ),
+                      ],
+                      icon: const Icon(Icons.more_vert, color: Colors.black),
+                    )
+                        : const SizedBox.shrink();
+                  },
+                ),
+              ],
+            ),
           ),
-        ],
+        ),
       ),
+
+
       body: Consumer<FeedViewModel>(
         builder: (context, viewModel, _) {
           final feed = viewModel.selectedFeed;
@@ -159,39 +214,209 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             return const Center(child: Text("게시글을 찾을 수 없습니다."));
           }
 
-          return Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  feed.title,
-                  style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-                ),
-                const SizedBox(height: 8),
-                Text(feed.content),
-                const SizedBox(height: 16),
-                Row(
+
+          return SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 600),
+              child: Container(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    IconButton(
-                      icon: Icon(
-                        feed.liked ? Icons.favorite : Icons.favorite_border,
-                        color: feed.liked ? Colors.red : Colors.grey,
-                        size: 30,
+                    Container(
+                      height: 64,
+                      padding: EdgeInsets.only(
+                          left: 16, right: 16, top: 8, bottom: 8),
+                      child: Row(
+                        children: [
+                          Container(
+                            width: 40,
+                            height: 40,
+                            decoration: ShapeDecoration(
+                              color: Colors.cyan,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(100),
+                              ),
+                            ),
+                          ),
+                          SizedBox(width: 8),
+                          Expanded(
+                            child: SizedBox(
+                              height: 48,
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    children: [
+                                      SizedBox(
+                                        height: 20,
+                                        child: Align(
+                                          alignment: Alignment.centerLeft,
+                                          child: Text(
+                                            feed.username,
+                                            style: TextStyle(
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                              fontFamily: 'Pretendard',
+                                              fontWeight: FontWeight.w400,
+                                              height: 1.40,
+                                              letterSpacing: -0.35,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  SizedBox(height: 4),
+                                  SizedBox(
+                                    height: 16,
+                                    child: Row(
+                                      children: [
+                                        Text(
+                                          feed.createdAt,
+                                          style: TextStyle(
+                                            color: const Color(0xFF888888),
+                                            fontSize: 12,
+                                            fontFamily: 'Pretendard',
+                                            fontWeight: FontWeight.w400,
+                                            height: 1.30,
+                                            letterSpacing: -0.30,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                      onPressed: () {
-                        viewModel.toggleLike(widget.feedId);
-                      },
                     ),
-                    const SizedBox(width: 8),
-                    Text("${feed.sumLike}명이 좋아합니다"),
+                    Center(
+                      child: Container(
+                        width:328,
+                        height: 410,
+                        padding: EdgeInsets.only(left: 16, right: 16),
+                        decoration: ShapeDecoration(
+                          shape: RoundedRectangleBorder(
+                            side: BorderSide(
+                              width: 1,
+                              color: const Color(0xFFE7E7E7),
+                            ),
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                      ),
+                    ),
+                    Container(
+                      height: 48,
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                      child: Row(
+                        children: [
+                          GestureDetector(
+                            onTap: () {
+                              viewModel.toggleLike(widget.feedId);
+                            },
+                            child: Icon(
+                              feed.liked ? Icons.favorite : Icons.favorite_border,
+                              color: feed.liked ? Colors.red : Colors.black,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "${feed.sumLike}",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w400,
+                              height: 1.40,
+                              letterSpacing: -0.35,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          GestureDetector(
+                            onTap: () {
+                            },
+                            child: Icon(
+                              Icons.mode_comment_outlined
+                            ),
+                          ),
+                          const SizedBox(width: 4),
+                          Text(
+                            "252",
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 14,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w400,
+                              height: 1.40,
+                              letterSpacing: -0.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Container(
+                      padding: const EdgeInsets.only(left: 16, right: 16, top: 8,bottom: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start, // ← 이 줄 추가
+                        children: [
+                          Text(
+                            feed.title,
+                            style: const TextStyle(
+                              color: Colors.black,
+                              fontSize: 18,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w700,
+                              height: 1.20,
+                              letterSpacing: -0.45,
+                            ),
+                          ),
+                          const SizedBox(height: 10),
+                          Text(
+                            feed.content,
+                            style: const TextStyle(
+                              color: Color(0xFF3D3D3D),
+                              fontSize: 14,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w500,
+                              height: 1.40,
+                              letterSpacing: -0.35,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      child: Container(
+                        padding: EdgeInsets.only(left: 10,right: 10,top: 12,bottom: 12),
+                        decoration: ShapeDecoration(
+                          color: const Color(0xFF3D3D3D),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                        ),
+                        child: Text(
+                          '시작하기',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 14,
+                            fontFamily: 'Pretendard',
+                            fontWeight: FontWeight.w500,
+                            height: 1.40,
+                            letterSpacing: -0.35,
+                          ),
+                        ),
+                      ),
+                    )
+
                   ],
                 ),
-                const SizedBox(height: 16),
-                Text("작성자: ${feed.username}"),
-                Text("조회수: ${feed.hits}"),
-                Text("작성일: ${feed.createdAt}"),
-              ],
+              ),
             ),
           );
         },

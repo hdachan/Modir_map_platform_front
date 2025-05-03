@@ -61,8 +61,9 @@ class FeedRepository {
   Future<FeedDetail> fetchFeedDetail(int feedId) async {
     final headers = await getAuthHeaders();
     final userId = headers['userId']!;
+    print("Request URL: $baseUrl/detail?feedId=$feedId&uuid=$userId");
     final response = await http.get(
-      Uri.parse("$baseUrl/detail?feedId=$feedId&uuid=$userId"),
+      Uri.parse("$baseUrl/detail?feedId=$feedId"),
       headers: {
         'Authorization': headers['Authorization']!,
       },
