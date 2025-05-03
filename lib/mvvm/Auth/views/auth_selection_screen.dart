@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../widget/auth_widget.dart';
-import 'SignUpPage.dart';
 import 'login_screen.dart';
 
 
@@ -96,10 +96,7 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
                             height: 32,
                             child: TextButton(
                               onPressed: () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(builder: (context) => const SignUpPage()),
-                                );
+                                context.go('/login/agree');
                               },
                               child: const Text(
                                 '회원가입',
