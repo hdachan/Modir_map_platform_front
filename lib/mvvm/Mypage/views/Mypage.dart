@@ -82,10 +82,7 @@ class _stateMyPageScreen extends State<MyPageScreen>
                           ],
                         ),
                       ),
-                      GestureDetector(
-                        onTap: () {
-                          print('Profile card tapped');
-                        },
+                      Container(
                         child: Container(
                           width: double.infinity,
                           height: 132,
@@ -94,26 +91,14 @@ class _stateMyPageScreen extends State<MyPageScreen>
                             width: double.infinity,
                             height: 84,
                             decoration: ShapeDecoration(
-                              gradient: const LinearGradient(
-                                begin: Alignment(1.00, -0.08),
-                                end: Alignment(-1, 0.08),
-                                colors: [Color(0xFF242424), Color(0x4C242424)],
-                              ),
+                              color: const Color(0xFFF6F6F6),
                               shape: RoundedRectangleBorder(
                                 side: BorderSide(
                                   width: 1,
-                                  color: const Color(0xFF3D3D3D),
+                                  color: const Color(0xFFE7E7E7),
                                 ),
                                 borderRadius: BorderRadius.circular(8),
                               ),
-                              shadows: const [
-                                BoxShadow(
-                                  color: Color(0x26000000),
-                                  blurRadius: 20,
-                                  offset: Offset(0, 4),
-                                  spreadRadius: 0,
-                                ),
-                              ],
                             ),
                             padding: const EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 8),
                             child: Row(
@@ -122,9 +107,9 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                   width: 48,
                                   height: 48,
                                   decoration: ShapeDecoration(
-                                    color: Colors.white,
+                                    color: Colors.black,
                                     shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(100),
+                                      borderRadius: BorderRadius.circular(4),
                                     ),
                                   ),
                                 ),
@@ -148,7 +133,7 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                                         ? profileVM.nicknameController.text
                                                         : '모디랑님',
                                                     style: TextStyle(
-                                                      color: Colors.white,
+                                                      color: Colors.black,
                                                       fontSize: 14,
                                                       fontFamily: 'Pretendard',
                                                       fontWeight: FontWeight.w700,
@@ -163,10 +148,8 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                                 height: 28,
                                                 padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
                                                 decoration: ShapeDecoration(
-                                                  shape: RoundedRectangleBorder(
-                                                    side: BorderSide(width: 1, color: const Color(0xFF05FFF7)),
-                                                    borderRadius: BorderRadius.circular(100),
-                                                  ),
+                                                  color: const Color(0xFF888888),
+                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
                                                 ),
                                                 child: Center(
                                                   child: Text(
@@ -188,18 +171,30 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                         SizedBox(height: 4),
                                         Container(
                                           height: 16,
-                                          child: Text(
-                                            profileVM.selectedGenderIndex == 0
-                                                ? '남성'
-                                                : (profileVM.selectedGenderIndex == 1 ? '여성' : '미설정'),
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontFamily: 'Pretendard',
-                                              fontWeight: FontWeight.w500,
-                                              height: 1.30,
-                                              letterSpacing: -0.30,
-                                            ),
+                                          child:Row(
+                                            children: [
+                                              Text(
+                                                '큐레이션 로그 알아보기',
+                                                style: TextStyle(
+                                                  color: const Color(0xFF888888),
+                                                  fontSize: 12,
+                                                  fontFamily: 'Pretendard',
+                                                  fontWeight: FontWeight.w400,
+                                                  height: 1.30,
+                                                  letterSpacing: -0.30,
+                                                ),
+                                              ),
+                                              SizedBox(width: 2),
+                                              Container(
+                                                width: 20,
+                                                height: 20,
+                                                child: Icon(
+                                                  Icons.arrow_forward_ios, // 원하는 화살표 아이콘 (예: arrow_forward)
+                                                  size: 12, // 아이콘 크기 조정 (Container 크기에 맞게)
+                                                  color: const Color(0xFF888888),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -210,7 +205,6 @@ class _stateMyPageScreen extends State<MyPageScreen>
                             ),
                           ),
                         ),
-
                       ),
                       middleText('관심'),
                       customButton(
