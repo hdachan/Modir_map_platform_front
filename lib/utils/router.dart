@@ -4,10 +4,13 @@ import 'package:modir/utils/SessionManager.dart';
 import 'package:modir/utils/session.dart';
 
 import '../map_screen.dart';
+import '../mvvm/Auth/views/SignUpPage.dart';
+import '../mvvm/Auth/views/agree_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
 import '../mvvm/Mypage/views/Mypage.dart';
 import '../mvvm/Mypage/views/SettingScreen.dart';
 import '../mvvm/Mypage/views/WithdrawalScreen.dart';
+import '../mvvm/Mypage/views/terms.dart';
 import '../mvvm/feed/WriteScreen.dart';
 import '../mvvm/feed/views/FeedDetailScreen.dart';
 import 'bottom_nav_screen.dart';
@@ -24,6 +27,18 @@ final GoRouter router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginSelectionScreen(),
+      routes: [
+        GoRoute(
+          path: 'agree',
+          builder: (context, state) => const AgreePage(),
+          routes: [
+            GoRoute(
+              path: 'signup',
+              builder: (context, state) => const SignUpPage(),
+            ),
+          ],
+        ),
+      ],
     ),
     ShellRoute(
       builder: (context, state, child) => BottomNavScreen(child: child),
@@ -60,6 +75,10 @@ final GoRouter router = GoRouter(
                 GoRoute(
                   path: 'withdrawal_reason',
                   pageBuilder: (context, state) => MaterialPage(child: WithdrawalScreen()),
+                ),
+                GoRoute(
+                  path: 'terms',
+                  pageBuilder: (context, state) => MaterialPage(child: termsScreen()),
                 ),
               ],
             ),

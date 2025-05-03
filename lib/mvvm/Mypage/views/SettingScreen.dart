@@ -109,6 +109,7 @@ class _SettingScreenState extends State<SettingScreen> with SingleTickerProvider
                 customButton(
                   '이용약관',
                       () {
+                    context.go('/mypage/setting/terms');
                   },
                 ),
                 middleText('기타'),

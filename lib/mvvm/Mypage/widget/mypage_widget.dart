@@ -123,7 +123,7 @@ Widget customButton(String title, VoidCallback onPressed) {
                 padding: const EdgeInsets.all(16),
                 child: Icon(
                   Icons.arrow_forward_ios_sharp,
-                  color: Colors.white,
+                  color: Color(0xFFD9D9D9),
                   size: 16,
                 ),
               ),
