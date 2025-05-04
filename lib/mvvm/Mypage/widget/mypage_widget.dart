@@ -1,59 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
+import 'package:flutter/services.dart';
 
 
 
-// 돟의하기 화면 상단바
-Widget CustomAppBar({required String title, required BuildContext context}) {
-  return LayoutBuilder(
-    builder: (context, constraints) {
-      return Container(
-        width: double.infinity,
-        height: 56,
-        color:  Colors.white,
-        padding: EdgeInsets.only(
-          right: 16,
-        ),
-        child: Row(
-          children: [
-            // 뒤로가기 버튼
-            GestureDetector(
-              onTap: () {
-                Navigator.pop(context);
-              },
-              child: Container(
-                width: 56,
-                height: 56,
-                padding: const EdgeInsets.all(16),
-                child: Icon(
-                  Icons.chevron_left,
-                  size: 24,
-                  color: Colors.black,
-                ),
-              ),
-            ),
-            Container(
-              height: 56,
-              padding: const EdgeInsets.only(top: 14,bottom: 14),
-              child: Text(
-                title,
-                style: TextStyle(
-                  color: Colors.black,
-                  fontSize: 20,
-                  fontFamily: 'Pretendard',
-                  fontWeight: FontWeight.w700,
-                  height: 1.40,
-                  letterSpacing: -0.50,
-                ),
-              ),
-            ),
-          ],
-        ),
-      );
-    },
-  );
-}
 
 
 // 마이페이지 중간 텍스트
@@ -134,3 +84,107 @@ Widget customButton(String title, VoidCallback onPressed) {
     },
   );
 }
+
+///로그인 버튼
+class LoginButton extends StatelessWidget {
+  final String buttonText;
+  final VoidCallback onTap;
+
+  const LoginButton({
+    Key? key,
+    required this.buttonText,
+    required this.onTap,
+  }) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        double buttonWidth = 328;
+
+        return Padding(
+          padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+          child: Container(
+            width: double.infinity,
+            height: 68,
+            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            child: InkWell(
+              onTap: onTap,
+              child: Container(
+                width: buttonWidth,
+                height: 44,
+                decoration: ShapeDecoration(
+                  color: Color(0xFF05FFF7),
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                ),
+                alignment: Alignment.center,
+                child: Text(
+                  buttonText,
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    color: Color(0xFF1A1A1A),
+                    fontSize: 14,
+                    fontFamily: 'Pretendard',
+                    fontWeight: FontWeight.w700,
+                    height: 1.40,
+                    letterSpacing: -0.35,
+                  ),
+                ),
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+}
+
+
+///선택 버튼
+Widget buildSelectionButtons(
+    List<String> labels, int selectedIndex, Function(int) onPressed, BoxConstraints constraints) {
+  return Container(
+    width: 360,
+    height: 48,
+    padding: EdgeInsets.only(left: 16, right: 16), // 최상위 패딩 유지
+    child: Container(
+      width:328,
+      height: 48,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, // 양옆으로 배치
+        children: List.generate(labels.length, (index) {
+          return InkWell(
+            onTap: () => onPressed(index),
+            child: Container(
+              width: 146,
+              height: 48,
+              decoration: ShapeDecoration(
+                shape: RoundedRectangleBorder(
+                  side: BorderSide(
+                    width: 1,
+                    color: selectedIndex == index ? Color(0xFF05FFF7) : Color(0xFF888888),
+                  ),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+              ),
+              child: Center(
+                child: Text(
+                  labels[index],
+                  style: TextStyle(
+                    color: selectedIndex == index ? Color(0xFF05FFF7) : Color(0xFF888888),
+                    fontSize: 16,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }),
+      ),
+    ),
+  );
+}
+
+
+

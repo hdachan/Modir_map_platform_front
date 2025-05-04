@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../utils/SessionManager.dart';
+import '../widget/mypage_appbar.dart';
 import '../widget/mypage_widget.dart';
 
 
@@ -103,7 +104,7 @@ class _SettingScreenState extends State<SettingScreen> with SingleTickerProvider
           child: Center(
             child: Column(
               children: [
-                CustomAppBar(title: '환경설정', context: context),
+                ProfileEditAppBar(title: '환경설정', context: context),
                 middleText('알림설정'),
                 middleText('정보'),
                 customButton(

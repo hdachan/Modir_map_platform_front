@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
-import '../../../utils/SessionManager.dart';
+import '../widget/mypage_appbar.dart';
 import '../widget/mypage_widget.dart';
 
 
@@ -32,19 +31,16 @@ class _termsScreenState extends State<termsScreen> with SingleTickerProviderStat
                 customButton(
                   '개인정보처리방침',
                       () {
-                    // context.go('/mypage/setting/withdrawal_reason');
                   },
                 ),
                 customButton(
                   '위치기반서비스 이용약관',
                       () {
-                    // context.go('/mypage/setting/withdrawal_reason');
                   },
                 ),
                 customButton(
                   '데이터제공정책',
                       () {
-                    // context.go('/mypage/setting/withdrawal_reason');
                   },
                 ),
 

@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
-import 'package:path/path.dart';
 import 'package:url_launcher/url_launcher.dart';
 
-import 'package:go_router/go_router.dart';
-import '../../Mypage/widget/mypage_widget.dart';
+import '../../Mypage/widget/mypage_appbar.dart';
+
 
 class AgreePage extends StatefulWidget {
   const AgreePage({super.key});

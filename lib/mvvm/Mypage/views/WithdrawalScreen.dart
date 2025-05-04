@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../viewmodels/WithdrawalViewModel.dart';
-import '../widget/mypage_widget.dart';
+import '../widget/mypage_appbar.dart';
 
 
 

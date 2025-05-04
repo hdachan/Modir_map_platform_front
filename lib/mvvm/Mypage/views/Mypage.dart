@@ -147,8 +147,9 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                               Spacer(),
                                               TextButton(
                                                 onPressed: () {
-                                                  // TODO: 버튼 클릭 시 동작
+                                                  context.go('/mypage/Profile');
                                                 },
+
                                                 style: TextButton.styleFrom(
                                                   padding: EdgeInsets.zero, // 내부 패딩 제거
                                                   minimumSize: Size.zero, // 최소 사이즈 제거
