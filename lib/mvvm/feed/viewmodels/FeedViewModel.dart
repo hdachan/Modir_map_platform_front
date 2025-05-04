@@ -101,7 +101,39 @@ class FeedViewModel extends ChangeNotifier {
     }
   }
 
+  ///삭제
+  final _feedRepository = FeedRepository();
 
+  Future<void> deleteFeed(int feedId) async {
+    try {
+      await _feedRepository.deleteFeed(feedId); // ✅ 올바른 호출
+    } catch (e) {
+      throw Exception("뷰모델 삭제 실패: $e");
+    }
+  }
+
+  /// 등록
+  Future<void> postFeed(String title, String content, {List<String>? pics}) async {
+    try {
+      _isLoading = true;
+      notifyListeners();
+
+      print("🟡 게시글 등록 시도: title=$title, pics=$pics");
+      await repository.postFeed(title, content, pics: pics);
+      await fetchFeeds();
+      print("🟢 게시글 등록 성공: title=$title");
+    } catch (e) {
+      print("🔴 게시글 등록 실패: $e");
+      throw Exception("게시글 등록에 실패했습니다: $e");
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+
+
+  /// 좋아요
   Future<void> toggleLike(int feedId) async {
     try {
       // 서버에서 좋아요 토글 결과 받아옴
@@ -146,35 +178,18 @@ class FeedViewModel extends ChangeNotifier {
   }
 
 
-  ///삭제
-  final _feedRepository = FeedRepository();
+  List<Feed> likedFeeds = [];
 
-  Future<void> deleteFeed(int feedId) async {
+  Future<void> loadLikedFeeds() async {
     try {
-      await _feedRepository.deleteFeed(feedId); // ✅ 올바른 호출
+      likedFeeds = await repository.getMyLikedFeeds(); // 직접 피드 데이터 가져오기
+      print("likedFeeds: ${likedFeeds.length}");
+      notifyListeners();
     } catch (e) {
-      throw Exception("뷰모델 삭제 실패: $e");
+      print("관심 피드 불러오기 실패: $e");
     }
   }
 
-  /// 등록
-  Future<void> postFeed(String title, String content, {List<String>? pics}) async {
-    try {
-      _isLoading = true;
-      notifyListeners();
-
-      print("🟡 게시글 등록 시도: title=$title, pics=$pics");
-      await repository.postFeed(title, content, pics: pics);
-      await fetchFeeds();
-      print("🟢 게시글 등록 성공: title=$title");
-    } catch (e) {
-      print("🔴 게시글 등록 실패: $e");
-      throw Exception("게시글 등록에 실패했습니다: $e");
-    } finally {
-      _isLoading = false;
-      notifyListeners();
-    }
-  }
 
 
 }

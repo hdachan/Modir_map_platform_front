@@ -7,6 +7,7 @@ import '../map_screen.dart';
 import '../mvvm/Auth/views/SignUpPage.dart';
 import '../mvvm/Auth/views/agree_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
+import '../mvvm/Mypage/views/FavoriteStoresScreen.dart';
 import '../mvvm/Mypage/views/Mypage.dart';
 import '../mvvm/Mypage/views/SettingScreen.dart';
 import '../mvvm/Mypage/views/WithdrawalScreen.dart';
@@ -81,6 +82,10 @@ final GoRouter router = GoRouter(
                   pageBuilder: (context, state) => MaterialPage(child: termsScreen()),
                 ),
               ],
+            ),
+            GoRoute(
+              path: 'LikedFeed',
+              pageBuilder: (context, state) => MaterialPage(child: LikedFeedScreen()),
             ),
           ],
         ),

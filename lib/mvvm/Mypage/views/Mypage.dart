@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../viewmodels/ProfileViewModel.dart';
 import '../widget/mypage_widget.dart';
@@ -144,27 +145,37 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                                 ),
                                               ),
                                               Spacer(),
-                                              Container(
-                                                height: 28,
-                                                padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
-                                                decoration: ShapeDecoration(
-                                                  color: const Color(0xFF888888),
-                                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                              TextButton(
+                                                onPressed: () {
+                                                  // TODO: 버튼 클릭 시 동작
+                                                },
+                                                style: TextButton.styleFrom(
+                                                  padding: EdgeInsets.zero, // 내부 패딩 제거
+                                                  minimumSize: Size.zero, // 최소 사이즈 제거
                                                 ),
-                                                child: Center(
-                                                  child: Text(
-                                                    '수정',
-                                                    style: TextStyle(
-                                                      color: Colors.white,
-                                                      fontSize: 12,
-                                                      fontFamily: 'Pretendard',
-                                                      fontWeight: FontWeight.w500,
-                                                      height: 1.30,
-                                                      letterSpacing: -0.30,
+                                                child: Container(
+                                                  height: 28,
+                                                  padding: const EdgeInsets.only(left: 12, right: 12, top: 4, bottom: 4),
+                                                  decoration: ShapeDecoration(
+                                                    color: const Color(0xFF888888),
+                                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                                                  ),
+                                                  child: const Center(
+                                                    child: Text(
+                                                      '수정',
+                                                      style: TextStyle(
+                                                        color: Colors.white,
+                                                        fontSize: 12,
+                                                        fontFamily: 'Pretendard',
+                                                        fontWeight: FontWeight.w500,
+                                                        height: 1.30,
+                                                        letterSpacing: -0.30,
+                                                      ),
                                                     ),
                                                   ),
                                                 ),
-                                              ),
+                                              )
+
                                             ],
                                           ),
                                         ),
@@ -210,12 +221,19 @@ class _stateMyPageScreen extends State<MyPageScreen>
                       customButton(
                         '관심 매장',
                             () {
+                          context.go('/mypage/LikedFeed');
                         },
                       ),
                       middleText('문의'),
                       customButton(
                         '사장님들 입점 문의하기!',
                             () async {
+                          final Uri url = Uri.parse('https://forms.gle/hrkbBsHA5BphXiN77');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } else {
+                            print('Could not launch $url');
+                          }
                         },
                       ),
                       middleText('센터'),
@@ -227,6 +245,12 @@ class _stateMyPageScreen extends State<MyPageScreen>
                       customButton(
                         '1:1 문의하기',
                             () async {
+                          final Uri url = Uri.parse('https://forms.gle/RfZyztPDJKZX4hnt7');
+                          if (await canLaunchUrl(url)) {
+                            await launchUrl(url, mode: LaunchMode.externalApplication);
+                          } else {
+                            print('Could not launch $url');
+                          }
                         },
                       ),
                     ],

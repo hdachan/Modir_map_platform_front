@@ -203,4 +203,44 @@ class FeedRepository {
       throw Exception("좋아요 실패: ${response.statusCode}");
     }
   }
+
+  Future<List<Feed>> getMyLikedFeeds() async {
+    try {
+      final headers = await getAuthHeaders();
+      final response = await http.get(
+        Uri.parse("http://localhost:8080/api/like/my"),
+        headers: {'Authorization': headers['Authorization']!},
+      ).timeout(const Duration(seconds: 10));
+
+      print("Response status: ${response.statusCode}");
+      print("Response body: ${response.body}");
+
+      if (response.statusCode == 200) {
+        try {
+          // UTF-8 디코딩
+          final String responseBody = utf8.decode(response.bodyBytes);
+          final Map<String, dynamic> decodedJson = jsonDecode(responseBody);
+
+          // JSON 구조 검증
+          if (decodedJson.containsKey("resultData") && decodedJson["resultData"] is List) {
+            final List<dynamic> data = decodedJson["resultData"];
+            return data.map((json) => Feed.fromJson(json)).toList();
+          } else {
+            throw Exception(
+                "서버 응답 형식이 올바르지 않습니다: 'resultData' 필드를 찾을 수 없거나 리스트 타입이 아닙니다.");
+          }
+        } catch (e) {
+          print("JSON 처리 오류: $e");
+          throw Exception("서버 응답을 처리하는 중 오류가 발생했습니다.");
+        }
+      } else {
+        print("서버 오류: ${response.statusCode}, 본문: ${response.body}");
+        throw Exception("관심 피드 목록 불러오기 실패: ${response.statusCode}");
+      }
+    } catch (e) {
+      print("getMyLikedFeeds 에러: $e");
+      rethrow;
+    }
+  }
+
 }
