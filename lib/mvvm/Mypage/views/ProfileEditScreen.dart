@@ -32,32 +32,40 @@ class ProfileEditScreen extends StatelessWidget {
                     children: [
                       CustomAppBar(title: '프로필 편집', context: context),
                       Container(
-                        padding: const EdgeInsets.only(top: 48),
-                        height: 148,
-                        color: Colors.white,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: const [
-                            Text(
-                              "정보 입력",
-                              style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                color: Colors.black,
-                                fontSize: 20,
-                                fontWeight: FontWeight.w700,
+                        height: 104,
+                        child: Center(
+                          child: Stack(
+                            children: [
+                              Container(
+                                width: 80,
+                                height: 80,
+                                decoration: ShapeDecoration(
+                                  color: const Color(0xFF888888),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
                               ),
-                            ),
-                            SizedBox(height: 8),
-                            Text(
-                              "활동하실 닉네임과 정보들을 입력해 주세요",
-                              style: TextStyle(
-                                fontFamily: 'Pretendard',
-                                color: Colors.black,
-                                fontSize: 12,
-                                fontWeight: FontWeight.w500,
+                              Positioned(
+                                right: 0,
+                                bottom: 0,
+                                child: Container(
+                                  width: 24,
+                                  height: 24,
+                                  decoration: BoxDecoration(
+                                    color: const Color(0xFFE7E7E7),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(
+                                    Icons.camera_alt,
+                                    size: 16,
+                                    color: Colors.black,
+                                  ),
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          )
+
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -120,8 +128,9 @@ class ProfileEditScreen extends StatelessWidget {
       color: Colors.black,
       fontFamily: 'Pretendard',
       fontSize: 14,
-      fontWeight: FontWeight.w500,
+      fontWeight: FontWeight.w700,
       height: 1.4,
+      letterSpacing: -0.35,
     ),
   );
 
