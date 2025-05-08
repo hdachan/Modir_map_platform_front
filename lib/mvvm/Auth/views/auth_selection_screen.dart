@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
+import '../services/AuthService.dart';
 import '../widget/auth_widget.dart';
 import 'login_screen.dart';
 
@@ -43,7 +44,10 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
                             backgroundColor: const Color(0xFFF2F2F2),
                             textColor: const Color(0xFF1F1F1F),
                             fontFamily: 'Roboto',
-                            onPressed: () => print('구글 로그인 버튼 눌렀습니다'),
+                            onPressed: () async {
+                              final authService = AuthService();
+                              await authService.signInWithGoogle();
+                            },
                           ),
                           const SizedBox(height: 16),
                           CustomLoginButton(

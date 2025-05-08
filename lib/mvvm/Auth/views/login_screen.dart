@@ -19,6 +19,7 @@ class _LoginPageState extends State<LoginPage> {
     final viewModel = Provider.of<AuthViewModel>(context);
 
     return Scaffold(
+      backgroundColor:  Colors.white,
       appBar: loginAppBar(
         context,
         "로그인",

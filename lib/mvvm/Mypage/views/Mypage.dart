@@ -54,6 +54,18 @@ class _stateMyPageScreen extends State<MyPageScreen>
                               ),
                             ),
                             const Spacer(),
+                            // 돋보기 아이콘
+                            Padding(
+                              padding: const EdgeInsets.only(right: 16),
+                              child: GestureDetector(
+                                onTap: () => print("돋보기 버튼 클릭"),
+                                child: const Icon(
+                                  Icons.search_rounded,
+                                  size: 24,
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
                             // 종 아이콘
                             Padding(
                               padding: const EdgeInsets.only(right: 16),
@@ -66,7 +78,7 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                 ),
                               ),
                             ),
-                            // 설정아이콘
+                            // 저장 아이콘
                             Padding(
                               padding: const EdgeInsets.only(right: 16),
                               child: GestureDetector(
@@ -252,6 +264,11 @@ class _stateMyPageScreen extends State<MyPageScreen>
                           } else {
                             print('Could not launch $url');
                           }
+                        },
+                      ),
+                      customButton(
+                        '버전',
+                            () {
                         },
                       ),
                     ],

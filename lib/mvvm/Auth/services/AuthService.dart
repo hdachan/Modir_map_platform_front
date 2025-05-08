@@ -1,6 +1,10 @@
+import 'package:flutter/foundation.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../model/login_result.dart';
 import 'package:http/http.dart' as http;
+
 
 class AuthService {
   final supabase = Supabase.instance.client;
@@ -70,4 +74,26 @@ class AuthService {
       return 'Spring 요청 실패: $e';
     }
   }
+
+  final GoogleSignIn _googleSignIn = GoogleSignIn();
+
+  Future<void> signInWithGoogle() async {
+    try {
+      await Supabase.instance.client.auth.signInWithOAuth(
+        OAuthProvider.google,
+        redirectTo: 'http://localhost:59172/auth/v1/callback', // 현재 포트로 변경
+      );
+      print('Google 로그인 완료');
+    } catch (e, stack) {
+      print('로그인 중 오류 발생: $e');
+      print('스택 트레이스: $stack');
+      if (e is AuthException) {
+        print('AuthException 세부 정보: ${e.message}');
+      }
+    }
+  }
+
+
+
+
 }
