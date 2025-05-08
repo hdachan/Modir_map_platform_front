@@ -3,7 +3,6 @@ import 'package:go_router/go_router.dart';
 import 'package:modir/utils/SessionManager.dart';
 import 'package:modir/utils/session.dart';
 
-import '../map_screen.dart';
 import '../mvvm/Auth/views/SignUpPage.dart';
 import '../mvvm/Auth/views/agree_screen.dart';
 import '../mvvm/Auth/views/auth_selection_screen.dart';
@@ -12,8 +11,9 @@ import '../mvvm/Mypage/views/Mypage.dart';
 import '../mvvm/Mypage/views/SettingScreen.dart';
 import '../mvvm/Mypage/views/WithdrawalScreen.dart';
 import '../mvvm/Mypage/views/terms.dart';
-import '../mvvm/feed/WriteScreen.dart';
+import '../mvvm/feed/views/WriteScreen.dart';
 import '../mvvm/feed/views/FeedDetailScreen.dart';
+import '../mvvm/feed/views/modiChat.dart';
 import 'bottom_nav_screen.dart';
 import '../mvvm/feed/views/FeedScreen.dart';
 

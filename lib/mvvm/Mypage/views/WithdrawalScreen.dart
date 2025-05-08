@@ -130,23 +130,71 @@ class WithdrawalScreen extends StatelessWidget {
                     }),
                   ),
                 ),
+
                 Container(
                   width: double.infinity, // 전체 너비로 설정
-                  padding: EdgeInsets.symmetric(horizontal: 16), // 양쪽에 16의 패딩 추가
-                  child: ElevatedButton(
-                    onPressed: () => viewModel.saveWithdrawalReason(context),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
+                  height: 48,
+                  padding: EdgeInsets.only(left: 16,right: 16,top: 8,bottom: 8), // 양쪽에 16의 패딩 추가
+                  child: Row(
+                    children: [
+                      Spacer(),
+                    Container(
+                      padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(context);
+                          // Navigator.pop(context); // 필요 시 Navigator 사용 (주석 처리)
+                        },
+                        style: TextButton.styleFrom(
+                          minimumSize: Size.zero, // 버튼 크기를 텍스트에 맞춤
+                          padding: EdgeInsets.zero, // 내부 패딩 제거
+                          tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 터치 영역 축소
+                        ),
+                        child: Text(
+                          '취소',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: const Color(0xFF5D5D5D),
+                            fontSize: 12,
+                            fontFamily: 'Pretendard',
+                            fontWeight: FontWeight.w500,
+                            height: 1.30,
+                            letterSpacing: -0.30,
+                          ),
+                        ),
                       ),
                     ),
-                    child: Text(
-                      "탈퇴하기",
-                      style: TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold),
-                    ),
+                      SizedBox(width: 24),
+                      Container(
+                        padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
+                        child: TextButton(
+                          onPressed: () {
+                            viewModel.saveWithdrawalReason(context);
+                          },
+                          style: TextButton.styleFrom(
+                            minimumSize: Size.zero, // 버튼 크기를 텍스트에 맞춤
+                            padding: EdgeInsets.zero, // 내부 패딩 제거
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap, // 터치 영역 축소
+                          ),
+                          child: Text(
+                            '확인',
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: const Color(0xFF5D5D5D),
+                              fontSize: 12,
+                              fontFamily: 'Pretendard',
+                              fontWeight: FontWeight.w500,
+                              height: 1.30,
+                              letterSpacing: -0.30,
+                            ),
+                          ),
+                        ),
+                      ),
+
+                    ],
                   ),
-                )
+                ),
+
 
 
               ],
