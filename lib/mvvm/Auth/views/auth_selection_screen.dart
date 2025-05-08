@@ -16,7 +16,7 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFF1A1A1A),
+      backgroundColor: Colors.white,
       resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
@@ -25,7 +25,7 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
               constraints: const BoxConstraints(maxWidth: 600),
               child: Container(
                 width: 600,
-                color: const Color(0xFF1A1A1A), // 600px 너비에 배경색 적용
+                color: Colors.white, // 600px 너비에 배경색 적용
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +102,7 @@ class _LoginSelectionScreenState extends State<LoginSelectionScreen> {
                                 '회원가입',
                                 textAlign: TextAlign.center,
                                 style: TextStyle(
-                                  color: Colors.white,
+                                  color: Colors.black,
                                   fontSize: 12,
                                   fontFamily: 'Pretendard',
                                   fontWeight: FontWeight.w500,

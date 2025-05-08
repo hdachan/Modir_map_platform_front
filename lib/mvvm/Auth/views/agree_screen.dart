@@ -250,17 +250,17 @@ Widget bottomBar(bool isButtonPressed, BuildContext context) {
                     borderRadius: BorderRadius.circular(8),
                   ),
                   height: 44, // 버튼 높이 조정
-                  child: const Text(
+                  child: Text(
                     '다음',
+                    textAlign: TextAlign.center,
                     style: TextStyle(
-                      color: Color(0xFF1A1A1A),
+                      color: const Color(0xFF1A1A1A),
+                      fontSize: 14,
                       fontFamily: 'Pretendard',
                       fontWeight: FontWeight.w700,
-                      height: 1.0,
-                      letterSpacing: -0.5,
-                      fontSize: 20,
+                      height: 1.40,
+                      letterSpacing: -0.35,
                     ),
-                    textAlign: TextAlign.center,
                   ),
                 ),
               ),
