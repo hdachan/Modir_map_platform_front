@@ -17,7 +17,7 @@ class WelcomeHeader extends StatelessWidget {
                 TextSpan(
                   text: '모디랑',
                   style: const TextStyle(
-                    color: Color(0xFF05FFF7),
+                    color: Colors.black,
                     fontSize: 24,
                     fontFamily: 'Pretendard',
                     fontWeight: FontWeight.w700,
@@ -28,7 +28,7 @@ class WelcomeHeader extends StatelessWidget {
                 TextSpan(
                   text: '에서 다양한\n매장 정보를 확인하세요',
                   style: const TextStyle(
-                    color: Colors.white,
+                    color: Colors.black,
                     fontSize: 24,
                     fontFamily: 'Pretendard',
                     fontWeight: FontWeight.w700,
@@ -45,7 +45,7 @@ class WelcomeHeader extends StatelessWidget {
           const Text(
             '나만의 분위기 , 라이프스타일 , 스타일링에 따라 매장을 추천받아보세요',
             style: TextStyle(
-              color: Colors.white,
+              color: Colors.black,
               fontSize: 14,
               fontFamily: 'Pretendard',
               fontWeight: FontWeight.w500,

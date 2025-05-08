@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import '../services/AuthService.dart';
-
 import '../../../utils/SessionManager.dart';
 
 class AuthViewModel extends ChangeNotifier {
@@ -16,35 +15,37 @@ class AuthViewModel extends ChangeNotifier {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
+  bool _isLoading = false;
+
+  bool get isLoading => _isLoading;
+
+  set isLoading(bool value) {
+    _isLoading = value;
+    notifyListeners();
+  }
+
   Future<void> signIn() async {
+    _isLoading = true;
+    errorMessage = null;
+    springResponse = null;
+    notifyListeners();
+
     final email = emailController.text.trim();
     final password = passwordController.text.trim();
 
     final result = await _authService.signIn(email, password);
 
+    _isLoading = false;
+
     if (result.jwt != null && result.userId != null) {
       jwt = result.jwt;
       userId = result.userId;
-      errorMessage = null;
-
+      springResponse = result.springResponse;
       await SessionManager().saveSession(jwt!, userId!);
     } else {
-      errorMessage = result.errorMessage;
+      errorMessage = result.errorMessage ?? '로그인에 실패했습니다.';
     }
 
-    notifyListeners();
-  }
-
-  Future<void> signUpTestUser() async {
-    final result = await _authService.signUpTestUser();
-    errorMessage = result;
-    notifyListeners();
-  }
-
-  Future<void> sendJwtToSpring({bool isPrivate = false}) async {
-    if (jwt == null) return;
-    final result = await _authService.sendJwtToSpring(jwt!, isPrivate: isPrivate);
-    springResponse = result;
     notifyListeners();
   }
 
