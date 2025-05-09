@@ -6,6 +6,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../viewmodels/ProfileViewModel.dart';
 import '../widget/mypage_widget.dart';
+import 'ProfileEditScreen.dart';
 
 
 class MyPageScreen extends StatefulWidget {
@@ -159,7 +160,10 @@ class _stateMyPageScreen extends State<MyPageScreen>
                                               Spacer(),
                                               TextButton(
                                                 onPressed: () {
-                                                  context.go('/mypage/Profile');
+                                                  Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(builder: (context) => ProfileEditScreen()),
+                                                  );
                                                 },
 
                                                 style: TextButton.styleFrom(

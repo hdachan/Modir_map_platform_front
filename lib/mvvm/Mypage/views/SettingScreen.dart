@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
 
 import '../../../utils/SessionManager.dart';
 import '../widget/mypage_appbar.dart';
@@ -18,6 +19,7 @@ class _SettingScreenState extends State<SettingScreen> with SingleTickerProvider
 
   Future<void> _logout() async {
     await SessionManager().clearSession();
+    await Supabase.instance.client.auth.signOut();
     context.go('/login');
   }
 

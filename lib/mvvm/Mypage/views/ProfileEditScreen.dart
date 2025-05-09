@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../Auth/widget/login_screen_widget.dart';
 import '../viewmodels/ProfileViewModel.dart';
 import '../widget/mypage_appbar.dart';
 
@@ -20,6 +21,12 @@ class ProfileEditScreen extends StatelessWidget {
                   viewModel.selectedGenderIndex != -1;
 
           return Scaffold(
+            appBar:                    emailAppBar(
+              context,
+              "모디랑 회원가입",
+              const Color(0xFF000000),
+                  () => print('완료 버튼 눌림'),
+            ),
             body: viewModel.isLoading
                 ? const Center(child: CircularProgressIndicator())
                 : Center(
@@ -30,7 +37,6 @@ class ProfileEditScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CustomAppBar(title: '프로필 편집', context: context),
                       Container(
                         height: 104,
                         child: Center(
