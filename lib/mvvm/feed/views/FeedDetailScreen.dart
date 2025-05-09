@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
+import '../../Mypage/widget/mypage_widget.dart';
 import '../viewmodels/FeedViewModel.dart';
 
 class FeedDetailScreen extends StatefulWidget {
@@ -338,23 +339,40 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                           const SizedBox(width: 8),
                           GestureDetector(
                             onTap: () {
+                              showModalBottomSheet(
+                                context: context,
+                                isScrollControlled: true,
+                                shape: const RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                ),
+                                builder: (BuildContext context) {
+                                  return const CustomBottomSheet(); // ← 바텀시트 내부 UI는 여기서 관리
+                                },
+                              );
                             },
-                            child: Icon(
-                              Icons.mode_comment_outlined
+                            behavior: HitTestBehavior.opaque,
+                            child: Row(
+                              children: [
+                                Icon(Icons.mode_comment_outlined),
+                                SizedBox(width: 4),
+                                Text(
+                                  "252",
+                                  style: const TextStyle(
+                                    color: Colors.black,
+                                    fontSize: 14,
+                                    fontFamily: 'Pretendard',
+                                    fontWeight: FontWeight.w400,
+                                    height: 1.40,
+                                    letterSpacing: -0.35,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                          const SizedBox(width: 4),
-                          Text(
-                            "252",
-                            style: const TextStyle(
-                              color: Colors.black,
-                              fontSize: 14,
-                              fontFamily: 'Pretendard',
-                              fontWeight: FontWeight.w400,
-                              height: 1.40,
-                              letterSpacing: -0.35,
-                            ),
-                          ),
+                          )
+
+
+
+
                         ],
                       ),
                     ),

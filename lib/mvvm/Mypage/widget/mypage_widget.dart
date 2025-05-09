@@ -186,5 +186,256 @@ Widget buildSelectionButtons(
   );
 }
 
+/// 바텀시트
 
+
+class CustomBottomSheet extends StatefulWidget {
+  const CustomBottomSheet({super.key});
+
+  @override
+  State<CustomBottomSheet> createState() => _CustomBottomSheetState();
+}
+
+class _CustomBottomSheetState extends State<CustomBottomSheet> {
+  final Map<int, bool> _repliesVisibility = {0: false, 1: false, 2: false};
+
+  @override
+  Widget build(BuildContext context) {
+    return DraggableScrollableSheet(
+      expand: false,
+      initialChildSize: 0.75,
+      minChildSize: 0.25,
+      maxChildSize: 1.0,
+      builder: (context, scrollController) {
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+          ),
+          child: Column(
+            children: [
+              // 댓글 리스트
+              Expanded(
+                child: ListView.builder(
+                  controller: scrollController,
+                  itemCount: 3, // 이미지 기준 3개 댓글
+                  itemBuilder: (context, index) {
+                    // 예시 데이터 (답글 포함)
+                    final comments = [
+                      {
+                        'username': '7_ouo_6',
+                        'content': '놀업음이 나혼산 명품자판.. 담을 돌기',
+                        'time': '2시간 전',
+                        'replies': [
+                          {'username': 'user1', 'content': '멋지네요!', 'time': '1시간 전'},
+                          {'username': 'user2', 'content': '동의합니다!', 'time': '30분 전'},
+                        ],
+                      },
+                      {
+                        'username': 'geonight',
+                        'content':
+                        '어느신 가게하시다.. 마우피 커피까지 완벽하네.. 가슴 떨뜨워지는 양상. 이건 아이 되겠다',
+                        'time': '3시간 전',
+                        'replies': [
+                          {'username': 'user3', 'content': '정말 멋져요!', 'time': '2시간 전'},
+                          {'username': 'user4', 'content': '추천합니다!', 'time': '1시간 전'},
+                          {'username': 'user5', 'content': '좋아요!', 'time': '10분 전'},
+                        ],
+                      },
+                      {
+                        'username': 'ackermann_1225',
+                        'content': '명품과자 맛깔내 주는 거야 꾸르르르르',
+                        'time': '5시간 전',
+                        'replies': [],
+                      },
+                    ];
+
+                    final comment = comments[index];
+                    final isRepliesVisible = _repliesVisibility[index] ?? false;
+
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              // 프로필 사진
+                              CircleAvatar(
+                                radius: 16,
+                                backgroundColor: Colors.grey[200],
+                                child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                              ),
+                              const SizedBox(width: 12),
+                              // 닉네임, 시간, 내용
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Text(
+                                          "${comment['username']}",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 8),
+                                        Text(
+                                          comment['time'] as String,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      comment['content'] as String,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.w400,
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    GestureDetector(
+                                      onTap: () {},
+                                      child: Text(
+                                        "답글 달기",
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    // 답글 더보기 (답글이 있는 경우만 표시)
+                                    if ((comment['replies'] as List).isNotEmpty) ...[
+                                      const SizedBox(height: 4),
+                                      GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            _repliesVisibility[index] = !isRepliesVisible;
+                                          });
+                                        },
+                                        child: Text(
+                                          isRepliesVisible ? "답글 숨기기" : "답글 ${(comment['replies'] as List).length}개 더보기",
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                          // 답글 목록
+                          if (isRepliesVisible && (comment['replies'] as List).isNotEmpty) ...[
+                            Padding(
+                              padding: const EdgeInsets.only(left: 40), // 들여쓰기
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: (comment['replies'] as List).map<Widget>((reply) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    child: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          "${reply['username']} ",
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.black,
+                                            fontSize: 14,
+                                          ),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            reply['content'] as String,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.w400,
+                                              color: Colors.black,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                        ),
+                                        Text(
+                                          reply['time'] as String,
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  );
+                                }).toList(),
+                              ),
+                            ),
+                          ],
+                        ],
+                      ),
+                    );
+                  },
+                ),
+              ),
+              // 댓글 입력창
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                child: Row(
+                  children: [
+                    // 사용자 프로필 사진
+                    CircleAvatar(
+                      radius: 16,
+                      backgroundColor: Colors.grey[200],
+                      child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                    ),
+                    const SizedBox(width: 12),
+                    // 텍스트 입력
+                    Expanded(
+                      child: TextField(
+                        decoration: InputDecoration(
+                          hintText: '댓글 달기...',
+                          hintStyle: TextStyle(
+                            color: Colors.grey[500],
+                            fontSize: 14,
+                          ),
+                          border: InputBorder.none,
+                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
+                        ),
+                      ),
+                    ),
+                    // 게시 버튼
+                    TextButton(
+                      onPressed: () {},
+                      child: const Text(
+                        "게시",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              // 키보드 오버레이 방지
+              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
 
