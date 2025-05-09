@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../../Mypage/widget/mypage_appbar.dart';
+import 'SignUpEmail.dart';
 
 
 class AgreePage extends StatefulWidget {
@@ -241,7 +242,11 @@ Widget bottomBar(bool isButtonPressed, BuildContext context) {
                 child: MaterialButton(
                   onPressed: isButtonPressed
                       ? () {
-                    context.go('/login/agree/signup');
+                    // context.go('/login/agree/signup');
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => SignUpScreen()),
+                    );
                   }
                       : null,
                   color: isButtonPressed ? const Color(0xFF05FFF7) : const Color(0xFFAFA6FF),
