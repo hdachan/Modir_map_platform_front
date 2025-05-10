@@ -122,21 +122,20 @@ class _LoginPageState extends State<LoginPage> {
                           style: const TextStyle(color: Colors.blue),
                         ),
                       ),
+                    bottomBar(
+                      buttonText: '로그인',
+                      onTap: () async {
+                        await viewModel.signIn();
+                        if (viewModel.jwt != null) {
+                          context.go('/community');
+                        }
+                      },
+                    ),
                   ],
                 ),
               ),
             ),
           ),
-          bottomNavigationBar: bottomBar(
-            buttonText: '로그인',
-            onTap: () async {
-              await viewModel.signIn();
-              if (viewModel.jwt != null) {
-                context.go('/community');
-              }
-            },
-          ),
-
         ),
         if (viewModel.isLoading)
           Container(
