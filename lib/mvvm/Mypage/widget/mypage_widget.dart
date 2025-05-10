@@ -262,10 +262,14 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               // 프로필 사진
-                              CircleAvatar(
-                                radius: 16,
-                                backgroundColor: Colors.grey[200],
-                                child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                              ClipRRect(
+                                borderRadius: BorderRadius.circular(8), // 원하는 라운드 값
+                                child: Container(
+                                  width: 32, // CircleAvatar의 radius: 16과 동일한 크기
+                                  height: 32,
+                                  color: Colors.grey[200],
+                                  child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                                ),
                               ),
                               const SizedBox(width: 12),
                               // 닉네임, 시간, 내용
@@ -323,13 +327,23 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                                             _repliesVisibility[index] = !isRepliesVisible;
                                           });
                                         },
-                                        child: Text(
-                                          isRepliesVisible ? "답글 숨기기" : "답글 ${(comment['replies'] as List).length}개 더보기",
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
-                                            fontWeight: FontWeight.w500,
-                                          ),
+                                        child: Row(
+                                          children: [
+                                            Icon(
+                                              isRepliesVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
+                                              size: 16,
+                                              color: Colors.grey[600],
+                                            ),
+                                            const SizedBox(width: 4),
+                                            Text(
+                                              isRepliesVisible ? "답글 숨기기" : "답글 ${(comment['replies'] as List).length}개 더보기",
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ],
@@ -343,36 +357,68 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                             Padding(
                               padding: const EdgeInsets.only(left: 40), // 들여쓰기
                               child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: (comment['replies'] as List).map<Widget>((reply) {
                                   return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 4),
+                                    padding: const EdgeInsets.symmetric(vertical: 8),
                                     child: Row(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: [
-                                        Text(
-                                          "${reply['username']} ",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
+                                        // 프로필 사진
+                                        CircleAvatar(
+                                          radius: 16,
+                                          backgroundColor: Colors.grey[200],
+                                          child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
                                         ),
+                                        const SizedBox(width: 12),
+                                        // 닉네임, 시간, 내용
                                         Expanded(
-                                          child: Text(
-                                            reply['content'] as String,
-                                            style: const TextStyle(
-                                              fontWeight: FontWeight.w400,
-                                              color: Colors.black,
-                                              fontSize: 14,
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          reply['time'] as String,
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
+                                          child: Column(
+                                            crossAxisAlignment: CrossAxisAlignment.start,
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  Text(
+                                                    "${reply['username']}",
+                                                    style: const TextStyle(
+                                                      fontWeight: FontWeight.w600,
+                                                      color: Colors.black,
+                                                      fontSize: 14,
+                                                    ),
+                                                  ),
+                                                  const SizedBox(width: 8),
+                                                  Text(
+                                                    reply['time'] as String,
+                                                    style: TextStyle(
+                                                      color: Colors.grey[600],
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                              const SizedBox(height: 4),
+                                              Text(
+                                                reply['content'] as String,
+                                                style: const TextStyle(
+                                                  fontWeight: FontWeight.w400,
+                                                  color: Colors.black,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                              const SizedBox(height: 4),
+                                              GestureDetector(
+                                                onTap: () {
+                                                  // TODO: 답글에 대한 답글 기능이 필요하면 여기 구현
+                                                },
+                                                child: Text(
+                                                  "답글 달기",
+                                                  style: TextStyle(
+                                                    color: Colors.grey[600],
+                                                    fontSize: 12,
+                                                    fontWeight: FontWeight.w500,
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
                                           ),
                                         ),
                                       ],
@@ -382,6 +428,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                               ),
                             ),
                           ],
+
                         ],
                       ),
                     );
@@ -394,41 +441,70 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                 child: Row(
                   children: [
                     // 사용자 프로필 사진
-                    CircleAvatar(
-                      radius: 16,
-                      backgroundColor: Colors.grey[200],
-                      child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                    ),
-                    const SizedBox(width: 12),
-                    // 텍스트 입력
-                    Expanded(
-                      child: TextField(
-                        decoration: InputDecoration(
-                          hintText: '댓글 달기...',
-                          hintStyle: TextStyle(
-                            color: Colors.grey[500],
-                            fontSize: 14,
-                          ),
-                          border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(vertical: 8),
-                        ),
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(8), // 원하는 라운드 값
+                      child: Container(
+                        width: 32, // CircleAvatar의 radius: 16과 동일한 크기
+                        height: 32,
+                        color: Colors.grey[200],
+                        child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
                       ),
                     ),
-                    // 게시 버튼
-                    TextButton(
-                      onPressed: () {},
-                      child: const Text(
-                        "게시",
-                        style: TextStyle(
-                          color: Colors.blue,
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
+                    const SizedBox(width: 12),
+                    // 텍스트 입력 필드 (EmailTextField 스타일 적용)
+                    Expanded(
+                      child: Container(
+                        height: 44,
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFF6F6F6),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: const EdgeInsets.only(left: 16, right: 8),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: TextEditingController(), // 필요 시 상태로 관리
+                                style: const TextStyle(
+                                  fontFamily: 'Pretendard',
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.black,
+                                ),
+                                decoration: const InputDecoration(
+                                  hintText: "큐레이션에 댓글 남기기",
+                                  hintStyle: TextStyle(
+                                    fontFamily: 'Pretendard',
+                                    color: Color(0xFF888888),
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  border: InputBorder.none,
+                                  isDense: true,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 16),
+                                ),
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: () {
+                                // 댓글 전송 로직
+                              },
+                              child: const Text(
+                                "게시",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
               ),
+
               // 키보드 오버레이 방지
               SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
             ],
