@@ -1,6 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
+
+import '../../feed/viewmodels/CommentViewModel.dart';
 
 
 
@@ -190,23 +193,44 @@ Widget buildSelectionButtons(
 
 
 class CustomBottomSheet extends StatefulWidget {
-  const CustomBottomSheet({super.key});
+  final int feedId;
+  const CustomBottomSheet({super.key, required this.feedId});
 
   @override
   State<CustomBottomSheet> createState() => _CustomBottomSheetState();
 }
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
-  final Map<int, bool> _repliesVisibility = {0: false, 1: false, 2: false};
+  final Map<int, bool> _repliesVisibility = {};
 
   @override
+  void initState() {
+    super.initState();
+    debugPrint('CustomBottomSheet initState: feedId=${widget.feedId}');
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      debugPrint('CustomBottomSheet postFrameCallback: fetching comments for feedId=${widget.feedId}');
+      try {
+        final viewModel = Provider.of<CommentViewModel>(context, listen: false);
+        debugPrint('CommentViewModel retrieved: $viewModel');
+        viewModel.resetPagination(); // 바텀시트 열 때 초기화
+        viewModel.fetchComments(widget.feedId);
+      } catch (e) {
+        debugPrint('Error in postFrameCallback: $e');
+      }
+    });
+  }
+
+  // 나머지 build 메서드는 동일
+  @override
   Widget build(BuildContext context) {
+    debugPrint('CustomBottomSheet building: feedId=${widget.feedId}');
     return DraggableScrollableSheet(
       expand: false,
       initialChildSize: 0.75,
       minChildSize: 0.25,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
+        debugPrint('DraggableScrollableSheet builder called');
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -214,298 +238,182 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
           ),
           child: Column(
             children: [
-              // 댓글 리스트
+              // 댓글 목록
               Expanded(
-                child: ListView.builder(
-                  controller: scrollController,
-                  itemCount: 3, // 이미지 기준 3개 댓글
-                  itemBuilder: (context, index) {
-                    // 예시 데이터 (답글 포함)
-                    final comments = [
-                      {
-                        'username': '7_ouo_6',
-                        'content': '놀업음이 나혼산 명품자판.. 담을 돌기',
-                        'time': '2시간 전',
-                        'replies': [
-                          {'username': 'user1', 'content': '멋지네요!', 'time': '1시간 전'},
-                          {'username': 'user2', 'content': '동의합니다!', 'time': '30분 전'},
-                        ],
-                      },
-                      {
-                        'username': 'geonight',
-                        'content':
-                        '어느신 가게하시다.. 마우피 커피까지 완벽하네.. 가슴 떨뜨워지는 양상. 이건 아이 되겠다',
-                        'time': '3시간 전',
-                        'replies': [
-                          {'username': 'user3', 'content': '정말 멋져요!', 'time': '2시간 전'},
-                          {'username': 'user4', 'content': '추천합니다!', 'time': '1시간 전'},
-                          {'username': 'user5', 'content': '좋아요!', 'time': '10분 전'},
-                        ],
-                      },
-                      {
-                        'username': 'ackermann_1225',
-                        'content': '명품과자 맛깔내 주는 거야 꾸르르르르',
-                        'time': '5시간 전',
-                        'replies': [],
-                      },
-                    ];
+                child: Selector<CommentViewModel, (bool, List<dynamic>, String?, bool)>(
+                  selector: (_, vm) => (vm.isLoading, vm.comments, vm.errorMessage, vm.hasMore),
+                  builder: (context, data, child) {
+                    final (isLoading, comments, errorMessage, hasMore) = data;
+                    final viewModel = context.read<CommentViewModel>();
 
-                    final comment = comments[index];
-                    final isRepliesVisible = _repliesVisibility[index] ?? false;
+                    if (isLoading && comments.isEmpty) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+                    if (errorMessage != null && comments.isEmpty) {
+                      return Center(child: Text(errorMessage));
+                    }
+                    if (comments.isEmpty) {
+                      return const Center(child: Text("댓글이 없습니다."));
+                    }
 
-                    return Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              // 프로필 사진
-                              ClipRRect(
-                                borderRadius: BorderRadius.circular(8), // 원하는 라운드 값
-                                child: Container(
-                                  width: 32, // CircleAvatar의 radius: 16과 동일한 크기
-                                  height: 32,
-                                  color: Colors.grey[200],
-                                  child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              // 닉네임, 시간, 내용
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Row(
-                                      children: [
-                                        Text(
-                                          "${comment['username']}",
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.w600,
-                                            color: Colors.black,
-                                            fontSize: 14,
-                                          ),
+                    return Column(
+                      children: [
+                        Expanded(
+                          child: ListView.builder(
+                            controller: scrollController,
+                            itemCount: comments.length + (hasMore ? 1 : 0),
+                            itemBuilder: (context, index) {
+                              if (index == comments.length && hasMore) {
+                                return Padding(
+                                  padding: const EdgeInsets.symmetric(vertical: 16),
+                                  child: Center(
+                                    child: ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.grey[200],
+                                        foregroundColor: Colors.black87,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(8),
                                         ),
-                                        const SizedBox(width: 8),
-                                        Text(
-                                          comment['time'] as String,
-                                          style: TextStyle(
-                                            color: Colors.grey[600],
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    Text(
-                                      comment['content'] as String,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.w400,
-                                        color: Colors.black,
-                                        fontSize: 14,
+                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                                       ),
+                                      onPressed: isLoading
+                                          ? null
+                                          : () => viewModel.fetchComments(widget.feedId),
+                                      child: isLoading
+                                          ? const SizedBox(
+                                        width: 18,
+                                        height: 18,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                          : const Text("댓글 더보기"),
                                     ),
-                                    const SizedBox(height: 4),
-                                    GestureDetector(
-                                      onTap: () {},
-                                      child: Text(
-                                        "답글 달기",
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                      ),
-                                    ),
-                                    // 답글 더보기 (답글이 있는 경우만 표시)
-                                    if ((comment['replies'] as List).isNotEmpty) ...[
-                                      const SizedBox(height: 4),
-                                      GestureDetector(
-                                        onTap: () {
-                                          setState(() {
-                                            _repliesVisibility[index] = !isRepliesVisible;
-                                          });
-                                        },
-                                        child: Row(
-                                          children: [
-                                            Icon(
-                                              isRepliesVisible ? Icons.keyboard_arrow_up : Icons.keyboard_arrow_down,
-                                              size: 16,
-                                              color: Colors.grey[600],
-                                            ),
-                                            const SizedBox(width: 4),
-                                            Text(
-                                              isRepliesVisible ? "답글 숨기기" : "답글 ${(comment['replies'] as List).length}개 더보기",
-                                              style: TextStyle(
-                                                color: Colors.grey[600],
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ],
-                                  ],
-                                ),
-                              ),
-                            ],
+                                  ),
+                                );
+                              }
+
+                              final comment = comments[index];
+                              final commentId = comment['commentId'] as int;
+                              final isRepliesVisible = _repliesVisibility[commentId] ?? false;
+                              final replies = context.read<CommentViewModel>().replies[commentId] ?? [];
+
+                              return CommentItem(
+                                comment: comment,
+                                isRepliesVisible: isRepliesVisible,
+                                replies: replies,
+                                onToggleReplies: () {
+                                  setState(() {
+                                    _repliesVisibility[commentId] = !isRepliesVisible;
+                                    if (isRepliesVisible) {
+                                      context.read<CommentViewModel>().replies.remove(commentId);
+                                    } else {
+                                      viewModel.fetchReplies(commentId);
+                                    }
+                                  });
+                                },
+                              );
+                            },
                           ),
-                          // 답글 목록
-                          if (isRepliesVisible && (comment['replies'] as List).isNotEmpty) ...[
-                            Padding(
-                              padding: const EdgeInsets.only(left: 40), // 들여쓰기
-                              child: Column(
-                                children: (comment['replies'] as List).map<Widget>((reply) {
-                                  return Padding(
-                                    padding: const EdgeInsets.symmetric(vertical: 8),
-                                    child: Row(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        // 프로필 사진
-                                        CircleAvatar(
-                                          radius: 16,
-                                          backgroundColor: Colors.grey[200],
-                                          child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                                        ),
-                                        const SizedBox(width: 12),
-                                        // 닉네임, 시간, 내용
-                                        Expanded(
-                                          child: Column(
-                                            crossAxisAlignment: CrossAxisAlignment.start,
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  Text(
-                                                    "${reply['username']}",
-                                                    style: const TextStyle(
-                                                      fontWeight: FontWeight.w600,
-                                                      color: Colors.black,
-                                                      fontSize: 14,
-                                                    ),
-                                                  ),
-                                                  const SizedBox(width: 8),
-                                                  Text(
-                                                    reply['time'] as String,
-                                                    style: TextStyle(
-                                                      color: Colors.grey[600],
-                                                      fontSize: 12,
-                                                    ),
-                                                  ),
-                                                ],
-                                              ),
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                reply['content'] as String,
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.w400,
-                                                  color: Colors.black,
-                                                  fontSize: 14,
-                                                ),
-                                              ),
-                                              const SizedBox(height: 4),
-                                              GestureDetector(
-                                                onTap: () {
-                                                  // TODO: 답글에 대한 답글 기능이 필요하면 여기 구현
-                                                },
-                                                child: Text(
-                                                  "답글 달기",
-                                                  style: TextStyle(
-                                                    color: Colors.grey[600],
-                                                    fontSize: 12,
-                                                    fontWeight: FontWeight.w500,
-                                                  ),
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                  );
-                                }).toList(),
-                              ),
-                            ),
-                          ],
-
-                        ],
-                      ),
+                        ),
+                      ],
                     );
                   },
                 ),
               ),
-              // 댓글 입력창
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                child: Row(
-                  children: [
-                    // 사용자 프로필 사진
-                    ClipRRect(
-                      borderRadius: BorderRadius.circular(8), // 원하는 라운드 값
-                      child: Container(
-                        width: 32, // CircleAvatar의 radius: 16과 동일한 크기
-                        height: 32,
-                        color: Colors.grey[200],
-                        child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                      ),
-                    ),
-                    const SizedBox(width: 12),
-                    // 텍스트 입력 필드 (EmailTextField 스타일 적용)
-                    Expanded(
-                      child: Container(
-                        height: 44,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF6F6F6),
-                          borderRadius: BorderRadius.circular(8),
+              // 댓글 입력 UI
+              Selector<CommentViewModel, (bool, String?)>(
+                selector: (_, vm) => (vm.isLoading, vm.errorMessage),
+                builder: (context, data, child) {
+                  final (isLoading, errorMessage) = data;
+                  final viewModel = context.read<CommentViewModel>();
+                  debugPrint('Comment input Selector builder');
+                  return Column(
+                    children: [
+                      if (errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: Text(
+                            errorMessage,
+                            style: const TextStyle(color: Colors.red, fontSize: 12),
+                          ),
                         ),
-                        padding: const EdgeInsets.only(left: 16, right: 8),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            Expanded(
-                              child: TextField(
-                                controller: TextEditingController(), // 필요 시 상태로 관리
-                                style: const TextStyle(
-                                  fontFamily: 'Pretendard',
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.black,
-                                ),
-                                decoration: const InputDecoration(
-                                  hintText: "큐레이션에 댓글 남기기",
-                                  hintStyle: TextStyle(
-                                    fontFamily: 'Pretendard',
-                                    color: Color(0xFF888888),
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                  border: InputBorder.none,
-                                  isDense: true,
-                                  contentPadding: EdgeInsets.symmetric(vertical: 16),
-                                ),
+                            ClipRRect(
+                              borderRadius: BorderRadius.circular(8),
+                              child: Container(
+                                width: 32,
+                                height: 32,
+                                color: Colors.grey[200],
+                                child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
                               ),
                             ),
-                            TextButton(
-                              onPressed: () {
-                                // 댓글 전송 로직
-                              },
-                              child: const Text(
-                                "게시",
-                                style: TextStyle(
-                                  color: Colors.blue,
-                                  fontSize: 14,
-                                  fontWeight: FontWeight.w600,
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Container(
+                                height: 44,
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFF6F6F6),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: const EdgeInsets.only(left: 16, right: 8),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: viewModel.controller,
+                                        style: const TextStyle(
+                                          fontFamily: 'Pretendard',
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w500,
+                                          color: Colors.black,
+                                        ),
+                                        decoration: const InputDecoration(
+                                          hintText: "큐레이션에 댓글 남기기",
+                                          hintStyle: TextStyle(
+                                            fontFamily: 'Pretendard',
+                                            color: Color(0xFF888888),
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          border: InputBorder.none,
+                                          isDense: true,
+                                          contentPadding: EdgeInsets.symmetric(vertical: 16),
+                                        ),
+                                      ),
+                                    ),
+                                    TextButton(
+                                      onPressed: isLoading
+                                          ? null
+                                          : () {
+                                        viewModel.postComment(widget.feedId);
+                                      },
+                                      child: isLoading
+                                          ? const SizedBox(
+                                        width: 16,
+                                        height: 16,
+                                        child: CircularProgressIndicator(strokeWidth: 2),
+                                      )
+                                          : const Text(
+                                        "게시",
+                                        style: TextStyle(
+                                          color: Colors.blue,
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
-                    ),
-                  ],
-                ),
+                    ],
+                  );
+                },
               ),
-
-              // 키보드 오버레이 방지
               SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
             ],
           ),
@@ -515,3 +423,182 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   }
 }
 
+// CommentItem은 이전 답변과 동일
+class CommentItem extends StatelessWidget {
+  final Map<String, dynamic> comment;
+  final bool isRepliesVisible;
+  final List<dynamic> replies;
+  final VoidCallback onToggleReplies;
+
+  const CommentItem({
+    super.key,
+    required this.comment,
+    required this.isRepliesVisible,
+    required this.replies,
+    required this.onToggleReplies,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Container(
+                  width: 32,
+                  height: 32,
+                  color: Colors.grey[200],
+                  child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          "${comment['username']}",
+                          style: const TextStyle(
+                            fontWeight: FontWeight.w600,
+                            color: Colors.black,
+                            fontSize: 14,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          comment['createdAt'] as String,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                            fontSize: 12,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      comment['content'] as String,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w400,
+                        color: Colors.black,
+                        fontSize: 14,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    GestureDetector(
+                      onTap: () {
+                        // TODO: 답글 달기 기능 구현
+                      },
+                      child: Text(
+                        "답글 달기",
+                        style: TextStyle(
+                          color: Colors.grey[600],
+                          fontSize: 12,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                    if (replies.isNotEmpty || isRepliesVisible) ...[
+                      const SizedBox(height: 4),
+                      GestureDetector(
+                        onTap: onToggleReplies,
+                        child: Row(
+                          children: [
+                            Icon(
+                              isRepliesVisible
+                                  ? Icons.keyboard_arrow_up
+                                  : Icons.keyboard_arrow_down,
+                              size: 16,
+                              color: Colors.grey[600],
+                            ),
+                            const SizedBox(width: 4),
+                            Text(
+                              isRepliesVisible
+                                  ? "답글 숨기기"
+                                  : "답글 ${replies.length}개 더보기",
+                              style: TextStyle(
+                                color: Colors.grey[600],
+                                fontSize: 12,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
+              ),
+            ],
+          ),
+          if (isRepliesVisible && replies.isNotEmpty) ...[
+            Padding(
+              padding: const EdgeInsets.only(left: 40),
+              child: Column(
+                children: replies.map<Widget>((reply) {
+                  return Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        CircleAvatar(
+                          radius: 16,
+                          backgroundColor: Colors.grey[200],
+                          child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Text(
+                                    "${reply['username']}",
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  const SizedBox(width: 8),
+                                  Text(
+                                    reply['createdAt'] as String,
+                                    style: TextStyle(
+                                      color: Colors.grey[600],
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                reply['content'] as String,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.w400,
+                                  color: Colors.black,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
+                    ),
+                  );
+                }).toList(),
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}

@@ -12,6 +12,8 @@ import 'mvvm/Auth/services/AuthService.dart';
 import 'mvvm/Auth/viewmodels/auth_view_model.dart';
 import 'mvvm/feed/services/FeedService.dart';
 import 'mvvm/feed/viewmodels/FeedViewModel.dart';
+import 'mvvm/feed/services/FeedCommentService.dart'; // 추가
+import 'mvvm/feed/viewmodels/CommentViewModel.dart'; // 추가
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -44,6 +46,7 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider(create: (_) => AuthViewModel(AuthService())),
         ChangeNotifierProvider(create: (_) => ProfileViewModel()),
         ChangeNotifierProvider(create: (_) => WithdrawalViewModel()),
+        ChangeNotifierProvider(create: (_) => CommentViewModel(FeedCommentService())), // 추가
       ],
       child: MaterialApp.router(
         title: 'modirApp',

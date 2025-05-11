@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../Mypage/widget/mypage_widget.dart';
 import '../viewmodels/FeedViewModel.dart';
+import '../viewmodels/CommentViewModel.dart'; // 추가
 
 class FeedDetailScreen extends StatefulWidget {
   final int feedId;
@@ -107,7 +108,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                 ScaffoldMessenger.of(context).showSnackBar(
                   const SnackBar(content: Text("삭제 완료")),
                 );
-                context.go('/community'); // ← 상세 화면 닫고 커뮤니티 목록으로 이동
+                context.go('/community'); // 상세 화면 닫고 커뮤니티 목록으로 이동
               } catch (e) {
                 ScaffoldMessenger.of(context).showSnackBar(
                   SnackBar(content: Text("삭제 실패: $e")),
@@ -124,7 +125,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor:  Colors.white,
+      backgroundColor: Colors.white,
       appBar: PreferredSize(
         preferredSize: const Size.fromHeight(56),
         child: AppBar(
@@ -151,13 +152,11 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                   ),
                 ),
                 const Spacer(),
-
                 // 설정 아이콘
                 Padding(
                   padding: const EdgeInsets.only(right: 8),
                   child: GestureDetector(
-                    onTap: () {
-                    },
+                    onTap: () {},
                     child: const Icon(
                       Icons.ios_share,
                       size: 24,
@@ -165,7 +164,6 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                     ),
                   ),
                 ),
-
                 // 작성자일 경우에만 메뉴 아이콘 추가
                 Consumer<FeedViewModel>(
                   builder: (context, viewModel, _) {
@@ -201,8 +199,6 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
           ),
         ),
       ),
-
-
       body: Consumer<FeedViewModel>(
         builder: (context, viewModel, _) {
           final feed = viewModel.selectedFeed;
@@ -215,7 +211,6 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
             return const Center(child: Text("게시글을 찾을 수 없습니다."));
           }
 
-
           return SingleChildScrollView(
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 600),
@@ -225,8 +220,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                   children: [
                     Container(
                       height: 64,
-                      padding: EdgeInsets.only(
-                          left: 16, right: 16, top: 8, bottom: 8),
+                      padding: EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
                       child: Row(
                         children: [
                           Container(
@@ -295,8 +289,8 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                     ),
                     Center(
                       child: Container(
-                        width:328,
-                        height: 410,
+                        width: 160,
+                        height: 200,
                         padding: EdgeInsets.only(left: 16, right: 16),
                         decoration: ShapeDecoration(
                           shape: RoundedRectangleBorder(
@@ -337,50 +331,54 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                             ),
                           ),
                           const SizedBox(width: 8),
-                          GestureDetector(
-                            onTap: () {
-                              showModalBottomSheet(
-                                context: context,
-                                isScrollControlled: true,
-                                shape: const RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-                                ),
-                                builder: (BuildContext context) {
-                                  return const CustomBottomSheet(); // ← 바텀시트 내부 UI는 여기서 관리
+                          Consumer<CommentViewModel>(
+                            builder: (context, commentViewModel, _) {
+                              return GestureDetector(
+                                onTap: () {
+                                  debugPrint('Comment button clicked, opening CustomBottomSheet with feedId: ${widget.feedId}');
+                                  showModalBottomSheet(
+                                    context: context,
+                                    isScrollControlled: true,
+                                    shape: const RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+                                    ),
+                                    builder: (BuildContext context) {
+                                      return CustomBottomSheet(feedId: widget.feedId);
+                                    },
+                                  ).then((_) {
+                                    Provider.of<CommentViewModel>(context, listen: false).clearData();
+                                    debugPrint('CustomBottomSheet closed');
+                                  });
                                 },
+                                behavior: HitTestBehavior.opaque,
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.mode_comment_outlined),
+                                    SizedBox(width: 4),
+                                    Text(
+                                      "${commentViewModel.comments.length}",
+                                      style: const TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 14,
+                                        fontFamily: 'Pretendard',
+                                        fontWeight: FontWeight.w400,
+                                        height: 1.40,
+                                        letterSpacing: -0.35,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               );
                             },
-                            behavior: HitTestBehavior.opaque,
-                            child: Row(
-                              children: [
-                                Icon(Icons.mode_comment_outlined),
-                                SizedBox(width: 4),
-                                Text(
-                                  "252",
-                                  style: const TextStyle(
-                                    color: Colors.black,
-                                    fontSize: 14,
-                                    fontFamily: 'Pretendard',
-                                    fontWeight: FontWeight.w400,
-                                    height: 1.40,
-                                    letterSpacing: -0.35,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          )
-
-
-
-
+                          ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 8),
                     Container(
-                      padding: const EdgeInsets.only(left: 16, right: 16, top: 8,bottom: 8),
+                      padding: const EdgeInsets.only(left: 16, right: 16, top: 8, bottom: 8),
                       child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start, // ← 이 줄 추가
+                        crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             feed.title,
@@ -412,7 +410,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                       width: double.infinity,
                       padding: const EdgeInsets.all(16),
                       child: Container(
-                        padding: EdgeInsets.only(left: 10,right: 10,top: 12,bottom: 12),
+                        padding: EdgeInsets.only(left: 10, right: 10, top: 12, bottom: 12),
                         decoration: ShapeDecoration(
                           color: const Color(0xFF3D3D3D),
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
@@ -430,8 +428,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                           ),
                         ),
                       ),
-                    )
-
+                    ),
                   ],
                 ),
               ),
