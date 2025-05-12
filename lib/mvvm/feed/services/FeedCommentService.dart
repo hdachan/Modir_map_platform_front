@@ -23,7 +23,7 @@ class FeedCommentService {
       'Authorization': 'Bearer $jwt',
       'Content-Type': 'application/json',
       'userId': userId,
-      'Cache-Control': 'no-cache', // 캐싱 방지
+      'Cache-Control': 'no-cache',
     };
   }
 
@@ -69,7 +69,12 @@ class FeedCommentService {
     }
     final json = jsonDecode(response.body);
     print('Parsed JSON: $json');
-    return json['resultData'] ?? [];
+    final replies = json['resultData'] ?? [];
+    print('Replies: $replies');
+    if (replies.isEmpty) {
+      print('Warning: No replies returned from server');
+    }
+    return replies;
   }
 
   Future<int> postComment(String content, int feedId) async {
@@ -97,8 +102,39 @@ class FeedCommentService {
       throw Exception('댓글 등록 실패: ${response.statusCode}');
     }
     final json = jsonDecode(response.body);
-    final newCommentId = json['resultData'] as int; // 새 commentId 반환
+    final newCommentId = json['resultData'] as int;
     print('New commentId: $newCommentId');
     return newCommentId;
+  }
+
+  Future<int> postReply(String content, int feedId, int parentCommentId) async {
+    print('postReply called with content: $content, feedId: $feedId, parentCommentId: $parentCommentId');
+    final headers = await getAuthHeaders();
+    final url = '$baseUrl/commment';
+    print('Post Reply URL: $url');
+    print('Headers: $headers');
+    print('Body: {"content": "$content", "feedId": $feedId, "parentCommentId": $parentCommentId}');
+    final response = await http.post(
+      Uri.parse(url),
+      headers: {
+        'Authorization': headers['Authorization']!,
+        'userId': headers['userId']!,
+        'Content-Type': 'application/json',
+      },
+      body: jsonEncode({
+        'content': content,
+        'feedId': feedId,
+        'parentCommentId': parentCommentId,
+      }),
+    );
+    print('Response Status: ${response.statusCode}');
+    print('Response Body: ${response.body}');
+    if (response.statusCode != 200) {
+      throw Exception('대댓글 등록 실패: ${response.statusCode}');
+    }
+    final json = jsonDecode(response.body);
+    final newReplyId = json['resultData'] as int;
+    print('New replyId: $newReplyId');
+    return newReplyId;
   }
 }

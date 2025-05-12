@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
-import '../../Mypage/widget/mypage_widget.dart';
+
 import '../viewmodels/FeedViewModel.dart';
-import '../viewmodels/CommentViewModel.dart'; // 추가
+import '../viewmodels/CommentViewModel.dart';
+import '../widget/commet.dart'; // 추가
 
 class FeedDetailScreen extends StatefulWidget {
   final int feedId;
@@ -342,7 +343,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                     ),
                                     builder: (BuildContext context) {
-                                      return CustomBottomSheet(feedId: 1); // feedId 전달
+                                      return CustomBottomSheet(feedId:widget.feedId); // feedId 전달
                                     },
                                   );
                                 },
@@ -351,17 +352,17 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                                   children: [
                                     Icon(Icons.mode_comment_outlined),
                                     SizedBox(width: 4),
-                                    Text(
-                                      "252",
-                                      style: const TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 14,
-                                        fontFamily: 'Pretendard',
-                                        fontWeight: FontWeight.w400,
-                                        height: 1.40,
-                                        letterSpacing: -0.35,
-                                      ),
-                                    ),
+                                    // Text(
+                                    //   "${commentViewModel.comments.length}",
+                                    //   style: const TextStyle(
+                                    //     color: Colors.black,
+                                    //     fontSize: 14,
+                                    //     fontFamily: 'Pretendard',
+                                    //     fontWeight: FontWeight.w400,
+                                    //     height: 1.40,
+                                    //     letterSpacing: -0.35,
+                                    //   ),
+                                    // ),
                                   ],
                                 ),
                               );
