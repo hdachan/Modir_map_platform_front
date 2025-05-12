@@ -4,7 +4,7 @@ import 'package:http/http.dart' as http;
 import '../../../utils/SessionManager.dart';
 
 class FeedCommentService {
-  static const String baseUrl = 'http://localhost:8080/api/comment'; // 에뮬레이터용
+  static const String baseUrl = 'http://localhost:8080/api/comment';
 
   FeedCommentService() {
     print('FeedCommentService created');
@@ -23,6 +23,7 @@ class FeedCommentService {
       'Authorization': 'Bearer $jwt',
       'Content-Type': 'application/json',
       'userId': userId,
+      'Cache-Control': 'no-cache', // 캐싱 방지
     };
   }
 
@@ -71,7 +72,7 @@ class FeedCommentService {
     return json['resultData'] ?? [];
   }
 
-  Future<void> postComment(String content, int feedId) async {
+  Future<int> postComment(String content, int feedId) async {
     print('postComment called with content: $content, feedId: $feedId');
     final headers = await getAuthHeaders();
     final url = baseUrl;
@@ -95,5 +96,9 @@ class FeedCommentService {
     if (response.statusCode != 200) {
       throw Exception('댓글 등록 실패: ${response.statusCode}');
     }
+    final json = jsonDecode(response.body);
+    final newCommentId = json['resultData'] as int; // 새 commentId 반환
+    print('New commentId: $newCommentId');
+    return newCommentId;
   }
 }

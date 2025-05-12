@@ -189,9 +189,6 @@ Widget buildSelectionButtons(
   );
 }
 
-/// 바텀시트
-
-
 class CustomBottomSheet extends StatefulWidget {
   final int feedId;
   const CustomBottomSheet({super.key, required this.feedId});
@@ -202,6 +199,7 @@ class CustomBottomSheet extends StatefulWidget {
 
 class _CustomBottomSheetState extends State<CustomBottomSheet> {
   final Map<int, bool> _repliesVisibility = {};
+  final ScrollController _scrollController = ScrollController();
 
   @override
   void initState() {
@@ -209,28 +207,26 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
     debugPrint('CustomBottomSheet initState: feedId=${widget.feedId}');
     WidgetsBinding.instance.addPostFrameCallback((_) {
       debugPrint('CustomBottomSheet postFrameCallback: fetching comments for feedId=${widget.feedId}');
-      try {
-        final viewModel = Provider.of<CommentViewModel>(context, listen: false);
-        debugPrint('CommentViewModel retrieved: $viewModel');
-        viewModel.resetPagination(); // 바텀시트 열 때 초기화
-        viewModel.fetchComments(widget.feedId);
-      } catch (e) {
-        debugPrint('Error in postFrameCallback: $e');
-      }
+      final viewModel = Provider.of<CommentViewModel>(context, listen: false);
+      viewModel.resetPagination();
+      viewModel.fetchComments(widget.feedId, forceFetch: true);
     });
   }
 
-  // 나머지 build 메서드는 동일
+  @override
+  void dispose() {
+    _scrollController.dispose();
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    debugPrint('CustomBottomSheet building: feedId=${widget.feedId}');
     return DraggableScrollableSheet(
-      expand: false,
-      initialChildSize: 0.75,
+      expand: true,
+      initialChildSize: 1.0,
       minChildSize: 0.25,
       maxChildSize: 1.0,
       builder: (context, scrollController) {
-        debugPrint('DraggableScrollableSheet builder called');
         return Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -238,15 +234,13 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
           ),
           child: Column(
             children: [
-              // 댓글 목록
               Expanded(
-                child: Selector<CommentViewModel, (bool, List<dynamic>, String?, bool)>(
-                  selector: (_, vm) => (vm.isLoading, vm.comments, vm.errorMessage, vm.hasMore),
+                child: Selector<CommentViewModel, (List<dynamic>, bool, bool, String?)>(
+                  selector: (_, vm) => (vm.comments, vm.isLoading, vm.hasMore, vm.errorMessage),
                   builder: (context, data, child) {
-                    final (isLoading, comments, errorMessage, hasMore) = data;
-                    final viewModel = context.read<CommentViewModel>();
-
-                    if (isLoading && comments.isEmpty) {
+                    final (comments, isLoading, hasMore, errorMessage) = data;
+                    debugPrint('Selector builder - Comments: $comments');
+                    if (isLoading) {
                       return const Center(child: CircularProgressIndicator());
                     }
                     if (errorMessage != null && comments.isEmpty) {
@@ -255,77 +249,64 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                     if (comments.isEmpty) {
                       return const Center(child: Text("댓글이 없습니다."));
                     }
-
-                    return Column(
-                      children: [
-                        Expanded(
-                          child: ListView.builder(
-                            controller: scrollController,
-                            itemCount: comments.length + (hasMore ? 1 : 0),
-                            itemBuilder: (context, index) {
-                              if (index == comments.length && hasMore) {
-                                return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 16),
-                                  child: Center(
-                                    child: ElevatedButton(
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor: Colors.grey[200],
-                                        foregroundColor: Colors.black87,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(8),
-                                        ),
-                                        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                                      ),
-                                      onPressed: isLoading
-                                          ? null
-                                          : () => viewModel.fetchComments(widget.feedId),
-                                      child: isLoading
-                                          ? const SizedBox(
-                                        width: 18,
-                                        height: 18,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      )
-                                          : const Text("댓글 더보기"),
-                                    ),
-                                  ),
-                                );
-                              }
-
-                              final comment = comments[index];
-                              final commentId = comment['commentId'] as int;
-                              final isRepliesVisible = _repliesVisibility[commentId] ?? false;
-                              final replies = context.read<CommentViewModel>().replies[commentId] ?? [];
-
-                              return CommentItem(
-                                comment: comment,
-                                isRepliesVisible: isRepliesVisible,
-                                replies: replies,
-                                onToggleReplies: () {
-                                  setState(() {
-                                    _repliesVisibility[commentId] = !isRepliesVisible;
-                                    if (isRepliesVisible) {
-                                      context.read<CommentViewModel>().replies.remove(commentId);
-                                    } else {
-                                      viewModel.fetchReplies(commentId);
-                                    }
-                                  });
+                    final viewModel = context.read<CommentViewModel>();
+                    return ListView.builder(
+                      controller: _scrollController,
+                      physics: const ClampingScrollPhysics(), // 스크롤 부드럽게
+                      cacheExtent: 1000, // 캐싱으로 성능 최적화
+                      itemCount: comments.length + (hasMore ? 1 : 0),
+                      itemBuilder: (context, index) {
+                        if (index == comments.length && hasMore) {
+                          return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            child: Center(
+                              child: ElevatedButton(
+                                onPressed: isLoading
+                                    ? null
+                                    : () {
+                                  debugPrint('More comments button pressed');
+                                  viewModel.fetchComments(widget.feedId, forceFetch: true);
                                 },
-                              );
-                            },
-                          ),
-                        ),
-                      ],
+                                child: isLoading
+                                    ? const SizedBox(
+                                  width: 18,
+                                  height: 18,
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                                    : const Text("댓글 더보기"),
+                              ),
+                            ),
+                          );
+                        }
+                        final comment = comments[index];
+                        final commentId = comment['commentId'] as int;
+                        final isRepliesVisible = _repliesVisibility[commentId] ?? false;
+                        final replies = viewModel.replies[commentId] ?? [];
+                        return CommentItem(
+                          comment: comment,
+                          isRepliesVisible: isRepliesVisible,
+                          replies: replies,
+                          onToggleReplies: () {
+                            setState(() {
+                              _repliesVisibility[commentId] = !isRepliesVisible;
+                              if (isRepliesVisible) {
+                                viewModel.replies.remove(commentId);
+                              } else {
+                                viewModel.fetchReplies(commentId);
+                              }
+                            });
+                          },
+                        );
+                      },
                     );
                   },
                 ),
               ),
-              // 댓글 입력 UI
               Selector<CommentViewModel, (bool, String?)>(
                 selector: (_, vm) => (vm.isLoading, vm.errorMessage),
                 builder: (context, data, child) {
                   final (isLoading, errorMessage) = data;
                   final viewModel = context.read<CommentViewModel>();
-                  debugPrint('Comment input Selector builder');
                   return Column(
                     children: [
                       if (errorMessage != null)
@@ -340,81 +321,52 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
                         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
                         child: Row(
                           children: [
-                            ClipRRect(
-                              borderRadius: BorderRadius.circular(8),
-                              child: Container(
-                                width: 32,
-                                height: 32,
-                                color: Colors.grey[200],
-                                child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                              ),
+                            CircleAvatar(
+                              radius: 16,
+                              backgroundColor: Colors.grey[200],
+                              child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
                             ),
                             const SizedBox(width: 12),
                             Expanded(
-                              child: Container(
-                                height: 44,
-                                decoration: BoxDecoration(
-                                  color: const Color(0xFFF6F6F6),
-                                  borderRadius: BorderRadius.circular(8),
+                              child: TextField(
+                                controller: viewModel.controller,
+                                decoration: const InputDecoration(
+                                  hintText: '댓글 달기...',
+                                  border: InputBorder.none,
+                                  contentPadding: EdgeInsets.symmetric(vertical: 8),
                                 ),
-                                padding: const EdgeInsets.only(left: 16, right: 8),
-                                child: Row(
-                                  children: [
-                                    Expanded(
-                                      child: TextField(
-                                        controller: viewModel.controller,
-                                        style: const TextStyle(
-                                          fontFamily: 'Pretendard',
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w500,
-                                          color: Colors.black,
-                                        ),
-                                        decoration: const InputDecoration(
-                                          hintText: "큐레이션에 댓글 남기기",
-                                          hintStyle: TextStyle(
-                                            fontFamily: 'Pretendard',
-                                            color: Color(0xFF888888),
-                                            fontWeight: FontWeight.w500,
-                                          ),
-                                          border: InputBorder.none,
-                                          isDense: true,
-                                          contentPadding: EdgeInsets.symmetric(vertical: 16),
-                                        ),
-                                      ),
-                                    ),
-                                    TextButton(
-                                      onPressed: isLoading
-                                          ? null
-                                          : () {
-                                        viewModel.postComment(widget.feedId);
-                                      },
-                                      child: isLoading
-                                          ? const SizedBox(
-                                        width: 16,
-                                        height: 16,
-                                        child: CircularProgressIndicator(strokeWidth: 2),
-                                      )
-                                          : const Text(
-                                        "게시",
-                                        style: TextStyle(
-                                          color: Colors.blue,
-                                          fontSize: 14,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
+                              ),
+                            ),
+                            TextButton(
+                              onPressed: isLoading
+                                  ? null
+                                  : () {
+                                debugPrint('Post comment button pressed');
+                                viewModel.postComment(widget.feedId);
+                              },
+                              child: isLoading
+                                  ? const SizedBox(
+                                width: 16,
+                                height: 16,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              )
+                                  : const Text(
+                                "게시",
+                                style: TextStyle(
+                                  color: Colors.blue,
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
                                 ),
                               ),
                             ),
                           ],
                         ),
                       ),
+                      SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
                     ],
                   );
                 },
               ),
-              SizedBox(height: MediaQuery.of(context).viewInsets.bottom),
             ],
           ),
         );
@@ -423,7 +375,7 @@ class _CustomBottomSheetState extends State<CustomBottomSheet> {
   }
 }
 
-// CommentItem은 이전 답변과 동일
+// CommentItem 클래스 (이전 코드 재사용)
 class CommentItem extends StatelessWidget {
   final Map<String, dynamic> comment;
   final bool isRepliesVisible;
@@ -448,14 +400,10 @@ class CommentItem extends StatelessWidget {
           Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(8),
-                child: Container(
-                  width: 32,
-                  height: 32,
-                  color: Colors.grey[200],
-                  child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
-                ),
+              CircleAvatar(
+                radius: 16,
+                backgroundColor: Colors.grey[200],
+                child: Icon(Icons.person, size: 20, color: Colors.grey[600]),
               ),
               const SizedBox(width: 12),
               Expanded(
@@ -494,7 +442,7 @@ class CommentItem extends StatelessWidget {
                     const SizedBox(height: 4),
                     GestureDetector(
                       onTap: () {
-                        // TODO: 답글 달기 기능 구현
+                        // 답글 달기 기능 (미구현)
                       },
                       child: Text(
                         "답글 달기",

@@ -335,7 +335,6 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                             builder: (context, commentViewModel, _) {
                               return GestureDetector(
                                 onTap: () {
-                                  debugPrint('Comment button clicked, opening CustomBottomSheet with feedId: ${widget.feedId}');
                                   showModalBottomSheet(
                                     context: context,
                                     isScrollControlled: true,
@@ -343,12 +342,9 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                                       borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
                                     ),
                                     builder: (BuildContext context) {
-                                      return CustomBottomSheet(feedId: widget.feedId);
+                                      return CustomBottomSheet(feedId: 1); // feedId 전달
                                     },
-                                  ).then((_) {
-                                    Provider.of<CommentViewModel>(context, listen: false).clearData();
-                                    debugPrint('CustomBottomSheet closed');
-                                  });
+                                  );
                                 },
                                 behavior: HitTestBehavior.opaque,
                                 child: Row(
@@ -356,7 +352,7 @@ class _FeedDetailScreenState extends State<FeedDetailScreen> {
                                     Icon(Icons.mode_comment_outlined),
                                     SizedBox(width: 4),
                                     Text(
-                                      "${commentViewModel.comments.length}",
+                                      "252",
                                       style: const TextStyle(
                                         color: Colors.black,
                                         fontSize: 14,
